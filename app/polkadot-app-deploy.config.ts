@@ -4,7 +4,7 @@
  * `icon` es obligatorio y solo acepta png o jpeg.
  */
 export default {
-  domain: 'testigocam26.dot',
+  domain: 'proofofcam.dot',
   displayName: 'testigo',
   description: 'Fotos con acta de nacimiento: firmadas por ti, ancladas a Polkadot y verificables con un QR. La foto se queda en tu teléfono.',
   icon: { path: './icon.png', format: 'png' },

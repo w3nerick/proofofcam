@@ -47,7 +47,7 @@ flowchart LR
     F -->|sha256 + dHash| R[Recibo]
     R -->|firma sr25519<br/>identidad .dot o seudónimo| S[PhotoRegistry]
     F -->|se queda| T[Tu teléfono]
-    S -->|acta permanente| V[Verificador<br/>testigocam26.dev-dot.li]
+    S -->|acta permanente| V[Verificador<br/>proofofcam.dev-dot.li]
     T -.->|quien recibe la foto<br/>escanea el QR| V
 ```
 
@@ -95,7 +95,7 @@ de fotos que no se tomaron aquí: es un acta de nacimiento, no un detector.
 
 ```
 testigo/
-├── app/                      Interfaz (se publica en testigocam26.dot)
+├── app/                      Interfaz (se publica en proofofcam.dot)
 │   ├── src/lib/
 │   │   ├── camera.ts         getUserMedia, un cuadro y apagado inmediato
 │   │   ├── photo.ts          QR estampado, JPEG, huellas, detección de EXIF
@@ -138,9 +138,9 @@ npm run simulate  # instancia el bytecode real contra el devnet, sin firmar
    PAS) y solo firma si escribes `DESPLEGAR`. La dirección queda en
    `contract/deployments.json`: copiarla a `REGISTRY_ADDRESS` en
    `app/src/lib/network.ts`.
-2. **App** (en Terminal.app): `cd app && npm run deploy` → `testigocam26.dot` y
-   `https://testigocam26.dev-dot.li`. Después, `npm run check-deploy`.
-3. **Probar el teléfono**: abrir `testigocam26.dot/#/diagnostico` en Polkadot App
+2. **App** (en Terminal.app): `cd app && npm run deploy` → `proofofcam.dot` y
+   `https://proofofcam.dev-dot.li`. Después, `npm run check-deploy`.
+3. **Probar el teléfono**: abrir `proofofcam.dot/#/diagnostico` en Polkadot App
    y copiar el reporte.
 
 ## Lo que se sabe de la plataforma (28 sep 2026)

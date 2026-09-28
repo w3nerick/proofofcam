@@ -18,13 +18,14 @@ export const PEOPLE_WS = [
 ];
 
 /**
- * Dominio de la app. Regla de DotNS v2: los dígitos finales deben ser 0 o 2 y
- * el resto es la base; con base de 9 o más el registro es abierto (`testigo`,
- * de 7, pediría personhood). Si cambia, cambiarlo también en package.json
- * (deploy) y en polkadot-app-deploy.config.ts. Define además la cuenta de
- * producto de la app, que es la del modo seudónimo.
+ * Dominio de la app, en la línea de Proof of Talk. Regla de DotNS v2: los
+ * dígitos finales deben ser 0 o 2 y el resto es la base; con base de 9 o más
+ * el registro es abierto (`proofofcam` tiene 10). Si cambia, cambiarlo también
+ * en package.json (deploy) y en polkadot-app-deploy.config.ts. Ojo: el dominio
+ * va dentro del QR de cada foto sellada y define la cuenta del modo seudónimo;
+ * cambiarlo después rompe esos enlaces.
  */
-export const APP_LABEL = 'testigocam26';
+export const APP_LABEL = 'proofofcam';
 export const APP_DOTNS = `${APP_LABEL}.dot`;
 
 /**

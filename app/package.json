@@ -8,7 +8,7 @@
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
     "test": "node --test \"test/*.test.ts\"",
-    "deploy": "npm run build && PAD_ENV=devnet pad dist testigocam26.dot",
+    "deploy": "npm run build && PAD_ENV=devnet pad dist proofofcam.dot",
     "check-deploy": "node scripts/check-deploy.ts",
     "icon": "node scripts/icon.ts"
   },

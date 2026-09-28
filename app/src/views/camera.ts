@@ -24,7 +24,7 @@ import { askChainSubmit } from '../lib/permissions';
 import { registryDeployed, freeBalance, isMapped, mapAccount, simulateSeal, submitSeal, readPhoto, pas, type SealArgs } from '../lib/registry';
 import { sharePhoto, downloadPhoto, canShareFiles } from '../lib/save';
 import { withTimeout, TIMED_OUT, describeError } from '../lib/host';
-import { FAUCET_URL } from '../lib/network';
+import { APP_DOTNS, FAUCET_URL } from '../lib/network';
 import { esc, toast, copyText, fmtBlock, fmtBytes, shortAddr, shortHash, type Cleanup } from '../ui';
 
 /** Tiempo para aprobar en el celular y que el bloque se finalice. */
@@ -98,7 +98,7 @@ export function renderCamera(root: HTMLElement): Cleanup {
         <p>La foto se toma aquí, se firma y se ancla a un bloque. No se sube a ningún lado: se queda en tu teléfono con un QR para verificarla.</p>
         ${error ? `<div class="note bad" style="text-align:left">${icon('warningCircle')}<span>${esc(error)}</span></div>` : ''}
         <button class="btn accent big" id="open">${icon('camera')}Encender cámara</button>
-        ${inside ? '' : `<p class="hint">Estás en un navegador normal: la foto sale como ensayo y no se sella en la cadena. Para sellar, abre <b>testigocam26.dot</b> en Polkadot App.</p>`}
+        ${inside ? '' : `<p class="hint">Estás en un navegador normal: la foto sale como ensayo y no se sella en la cadena. Para sellar, abre <b>${APP_DOTNS}</b> en Polkadot App.</p>`}
       </div>
       <div class="cam-bottom">${chips()}</div>
     </div>`;

@@ -54,7 +54,7 @@ valores derivados de la llave, indistinguibles de un compromiso real.
 
 ## Seudónimo
 
-La cuenta de producto que el host deriva para `testigocam26.dot` firma igual
+La cuenta de producto que el host deriva para `proofofcam.dot` firma igual
 que la identidad, pero nadie puede ligarla a un username. Para que siga así:
 
 - **Paga su propia transacción.** Si la pagara la identidad, la transacción
