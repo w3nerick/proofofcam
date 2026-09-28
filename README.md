@@ -38,6 +38,25 @@ Polkadot Desktop), firma con la identidad `.dot` del usuario y registra en un
 contrato de pallet-revive. Su nombre sigue a Proof of Talk, y es hermano de [testalk](https://github.com/w3nerick/testalk),
 que hace lo mismo con charlas.
 
+## Para qué sirve
+
+- **Periodismo y reportes ciudadanos**: probar que una foto existía, sin exponer a quien la tomó.
+- **Evidencia de eventos**: la foto lleva su QR; quien la vea en redes sabe quién la tomó y cuándo.
+- **Seguros, peritajes, avance de obra**: fecha probada por la cadena y ubicación revelada solo a quien toca.
+- **Derechos humanos**: seudónimo y ubicación apagada.
+- **Fact-checking con Firefly**: evidencia fotográfica firmada por humanos verificados.
+
+¿Es viable, qué falta probar y cómo se compara con ProofMode, Capture o el Pixel 10?
+En [`docs/viabilidad.md`](docs/viabilidad.md).
+
+## Documentación
+
+| Documento | Qué explica |
+|---|---|
+| [`docs/firma-y-cuentas.md`](docs/firma-y-cuentas.md) | Cuenta de identidad y cuentas de producto: qué queda guardado al firmar, cómo se comprueba el nombre |
+| [`docs/privacidad.md`](docs/privacidad.md) | Qué sale del teléfono, ubicación por niveles, contra quién protege y contra quién no, uso sensible |
+| [`docs/viabilidad.md`](docs/viabilidad.md) | Lo probado y lo pendiente con evidencia, límites, usos, comparación y plan |
+
 ## Cómo funciona
 
 ```mermaid
@@ -110,14 +129,15 @@ pagos sin rastro con Coinage) está en [`docs/privacidad.md`](docs/privacidad.md
 
 ## Qué prueba y qué no
 
-**Prueba** quién la tomó (firma y People chain), que no existía antes del bloque
+**Prueba** quién la tomó (firma y People chain; ver [cómo se firma](docs/firma-y-cuentas.md)), que no existía antes del bloque
 previo ni después del bloque del sello, que no cambió ni un píxel, y que salió de
 la cámara de la app: aquí no se puede sellar una foto de la galería.
 
 **No prueba** que la escena sea real: una foto de una pantalla con una imagen
 hecha por IA también queda firmada (el "agujero analógico", que tampoco resuelven
 C2PA, Leica ni el Pixel 10). La ubicación la declara el teléfono. Y no dice nada
-de fotos que no se tomaron aquí: es un acta de nacimiento, no un detector.
+de fotos que no se tomaron aquí: es un acta de nacimiento, no un detector. Y el
+seudónimo esconde tu nombre pero no te hace anónimo ([contra quién protege](docs/privacidad.md#contra-quién-protege)).
 
 ## Estructura
 

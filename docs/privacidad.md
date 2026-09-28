@@ -80,6 +80,39 @@ el seudónimo siga sin ligarse a tu nombre:
 - **No la fondees desde tu identidad.** Esa transferencia también las ligaría.
   Mejor el faucet.
 
+Cómo funcionan las dos cuentas, en [`firma-y-cuentas.md`](firma-y-cuentas.md).
+
+## Contra quién protege
+
+La foto, la ubicación y los metadatos quedan bien protegidos frente a todos. Lo
+que depende del adversario es **quién tomó la foto**:
+
+| Frente a | Con identidad | Con seudónimo |
+|---|---|---|
+| Quien recibe la foto o mira el acta | Sabe que fuiste tú (a propósito) | No sabe quién eres |
+| Otras apps de Polkadot | No te ven: cada app tiene su propia cuenta | Igual |
+| Alguien que analiza la cadena | Ve cuántas fotos firmaste y cuándo | Ve que tus fotos seudónimas son de la misma persona |
+| El rastro del dinero | — | **Punto débil.** Si el saldo viene de tu identidad, quedas ligado; el faucet ve tu IP; en mainnet conseguir DOT sin ligarte es difícil |
+| Polkadot App (el host) | Lo sabe todo | **También lo sabe todo**: tiene tus llaves y sabe que el seudónimo es tuyo |
+| El contenido de la foto | — | Una cara, una calle o tu ventana te delatan igual |
+
+En pocas palabras: **el seudónimo esconde tu nombre, pero no te hace anónimo.**
+Aguanta frente a quien ve la foto o el acta; no aguanta frente a alguien
+decidido a seguir el dinero o a juntar tus fotos, ni frente al host. El
+anonimato real llega con las piezas de [la última sección](#lo-que-falta-para-cerrar-los-huecos).
+
+## Si lo usas para algo sensible
+
+Para una denuncia o un reporte donde exponerte es un riesgo:
+
+1. Firma con **seudónimo**.
+2. Consigue su saldo **solo del faucet**, nunca desde tu identidad ni desde una
+   cuenta de exchange con tus datos.
+3. Deja la **ubicación apagada**, o revela solo el nivel "región".
+4. Revisa lo que sale en la foto: caras, placas, reflejos, tu ventana.
+5. Si puedes, sella desde una red que no sea la tuya de siempre: el host y los
+   nodos a los que se conecta ven tu IP al mandar la transacción.
+
 ## Qué no protege
 
 - **La foto misma.** Si la foto muestra una cara, una placa o una calle, eso
