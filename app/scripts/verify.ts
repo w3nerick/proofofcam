@@ -6,7 +6,8 @@
  *
  * Lee PhotoRegistry y los bloques por RPC público de Asset Hub y el dueño del
  * username por People chain. Todo lo demás se calcula aquí. Sale con 0 si el
- * acta es válida y con 1 si no.
+ * acta es válida (y la foto, si se dio, es idéntica), con 1 si el acta no es
+ * válida y con 3 si el acta es válida pero la foto no es una copia exacta.
  */
 import { readFileSync } from 'node:fs';
 import { createClient, Binary } from 'polkadot-api';
@@ -92,10 +93,16 @@ check(onchain ? onchain.toLowerCase() === rc.block.hash.toLowerCase() : null, `E
 console.log(`· Ventana: entre el bloque #${rc.block.n.toLocaleString('en-US')} y el #${Number(p.blockNumber).toLocaleString('en-US')} (${Number(p.blockNumber) - rc.block.n} bloques)`);
 console.log(`· Ubicación: ${rc.loc ? 'sellada y cifrada (solo su dueño puede revelar un nivel)' : 'sin ubicación'}`);
 
+console.log(ok ? c.ok('\nACTA VÁLIDA\n') : c.bad('\nACTA INVÁLIDA\n'));
+
+// La copia es otra pregunta: una copia distinta no vuelve inválida el acta.
+let copyOk = true;
 if (file) {
   const sha = sha256Hex(new Uint8Array(readFileSync(file)));
-  check(sha.toLowerCase() === p.imageHash.toLowerCase(), `${file} es idéntica a la foto sellada`, `${file} no es idéntica (para copias recomprimidas usa la página del acta)`);
+  copyOk = sha.toLowerCase() === p.imageHash.toLowerCase();
+  console.log(copyOk
+    ? c.ok(`✓ ${file} es idéntica a la foto sellada`)
+    : c.warn(`? ${file} no es idéntica byte a byte. Si pasó por un chat o se copió entre teléfonos, es normal: compárala en la página del acta, que reconoce copias recomprimidas.`));
+  console.log('');
 }
-
-console.log(ok ? c.ok('\nACTA VÁLIDA\n') : c.bad('\nACTA INVÁLIDA\n'));
-done(ok ? 0 : 1);
+done(ok ? (copyOk ? 0 : 3) : 1);

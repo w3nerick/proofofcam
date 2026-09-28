@@ -9,6 +9,7 @@ acta `ckaaqtce3u7gukpz`, bloque 13,814,797, verificada con `npm run verify`.
 | Pieza | Evidencia |
 |---|---|
 | **Todo el flujo en iPhone** | Polkadot App iOS, 28 sep 2026: el host conecta con el códec 1, la cámara funciona dentro de la app, la firma y la transacción al contrato también. Acta `ckaaqtce3u7gukpz`: firma válida, coincide con su recibo, bloque previo #13,814,764 existe |
+| Firma con identidad desde iPhone | Acta `xl7i4gn2asohlvr6` (bloque 13,815,748): la llave es la dueña del username en People chain. Su copia pasada a la Mac (reducida a 1294×2560) da distancia 0 y su QR se lee |
 | Marco con QR | La foto queda intacta y el QR va en una franja debajo. En Chrome: el QR se lee en el original y recomprimido, y la huella visual da 0 de 64 contra la copia entera, recomprimida al 30 % o sin el marco |
 | Huella visual con fotos reales | Una copia de una foto sellada, recomprimida al pasarla del iPhone a la Mac, da distancia 0 de 64 contra su acta. Otra toma de la misma escena da 14: "no es esta foto" |
 | Cuenta de producto con saldo | En iOS, la cuenta de producto de `proofofcam.dot` ya tenía 5,000 PAS en el devnet: el modo seudónimo no necesitó faucet |
