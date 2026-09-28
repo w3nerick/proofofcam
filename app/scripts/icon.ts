@@ -1,5 +1,5 @@
 /**
- * Ícono de testigo: las esquinas del visor de una cámara, el lente y el
+ * Ícono de Proof of Cam: las esquinas del visor de una cámara, el lente y el
  * punto del sello en rojo. La marca de la barra superior (src/ui.ts, MARK) es el
  * mismo dibujo en currentColor.
  *

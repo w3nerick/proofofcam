@@ -36,9 +36,9 @@ export const LEVELS = [
 
 export type Level = 1 | 2 | 3 | 4;
 
-/** Contexto para `deriveEntropy`: 14 bytes (el host acepta hasta 32). */
-export const ENTROPY_CONTEXT = 'testigo/loc/v1';
-const TAG = 'testigo/loc/v1';
+/** Contexto para `deriveEntropy`: 17 bytes (el host acepta hasta 32). */
+export const ENTROPY_CONTEXT = 'proofofcam/loc/v1';
+const TAG = 'proofofcam/loc/v1';
 
 export interface SealedLocation {
   /** sha256 de los cuatro compromisos concatenados. */

@@ -20,7 +20,7 @@ export function topbar(): string {
   return `
   <header class="topbar">
     <div class="shell topbar-in">
-      <a class="brand" href="#/">${MARK}<span>testigo</span></a>
+      <a class="brand" href="#/">${MARK}<span>proof of cam</span></a>
       <nav class="nav">${link('camara', 'Cámara')}${link('verificar', 'Verificar')}</nav>
     </div>
   </header>`;

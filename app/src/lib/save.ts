@@ -9,7 +9,7 @@
  */
 export type SaveResult = 'shared' | 'cancelled' | 'unsupported' | 'downloaded';
 
-export const fileName = (id: string) => `testigo-${id}.jpg`;
+export const fileName = (id: string) => `proofofcam-${id}.jpg`;
 
 export function canShareFiles(): boolean {
   try {

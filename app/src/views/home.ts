@@ -53,7 +53,7 @@ export function renderHome(root: HTMLElement): Cleanup {
     </section>
 
     <footer class="shell foot">
-      <span>testigo · Products Devnet</span>
+      <span>Proof of Cam · Products Devnet</span>
       <a href="#/diagnostico">Diagnóstico del dispositivo</a>
     </footer>
   </main>`;

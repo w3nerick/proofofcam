@@ -146,7 +146,7 @@ test('recibo: bytes estables, firma sr25519 válida y cualquier cambio la rompe'
   await cryptoWaitReady();
   const pair = sr25519PairFromSeed(new Uint8Array(32).fill(3));
   const r: Receipt = {
-    v: 1, app: 'testigo', id: newId(), sha256: '0x' + 'ab'.repeat(32), dhash: '0f0e0d0c0b0a0908',
+    v: 1, app: 'proofofcam', id: newId(), sha256: '0x' + 'ab'.repeat(32), dhash: '0f0e0d0c0b0a0908',
     w: 1920, h: 1440, type: 'image/jpeg', size: 523211, stamp: true, camera: 'back', taken: '2026-09-28T19:20:11Z',
     block: { n: 13_806_571, hash: '0x' + 'cd'.repeat(32) }, loc: sealLocation(master, 'k3m9x2qp7t4v8w1a', 'dhwtq2vx', 4),
     who: 'ana.01', mode: 'identity', net: 'products-devnet', genesis: '0x' + 'ee'.repeat(32),
@@ -167,6 +167,6 @@ test('recibo: bytes estables, firma sr25519 válida y cualquier cambio la rompe'
   const wrapped = new Uint8Array([...new TextEncoder().encode('<Bytes>'), ...bytes, ...new TextEncoder().encode('</Bytes>')]);
   assert.equal(await verifyReceiptSig(bytes, u8aToHex(sr25519Sign(wrapped, pair)), pub), true);
 
-  assert.equal(parseReceipt(new TextEncoder().encode('{"v":2}')), 'no es un recibo de Testigo v1');
+  assert.equal(parseReceipt(new TextEncoder().encode('{"v":2}')), 'no es un recibo de Proof of Cam v1');
   assert.equal(typeof parseReceipt(receiptBytes({ ...r, id: 'mal' })), 'string');
 });

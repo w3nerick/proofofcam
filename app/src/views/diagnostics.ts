@@ -1,5 +1,5 @@
 /**
- * Diagnóstico: mide en ESTE teléfono cada pieza que testigo necesita y deja un
+ * Diagnóstico: mide en ESTE teléfono cada pieza que Proof of Cam necesita y deja un
  * reporte copiable. Nada de lo que mide se guarda ni se envía; el reporte solo
  * sale si tú lo copias. No muestra coordenadas: de la ubicación solo dice si
  * llegó y con qué precisión.
@@ -41,7 +41,7 @@ async function testJpeg(): Promise<Blob> {
   ctx.fillRect(0, 0, 480, 320);
   ctx.fillStyle = '#fff';
   ctx.font = '700 36px monospace';
-  ctx.fillText('testigo · prueba', 40, 170);
+  ctx.fillText('proof of cam · prueba', 40, 170);
   return new Promise((res, rej) => c.toBlob(b => (b ? res(b) : rej(new Error('sin JPEG'))), 'image/jpeg', 0.9));
 }
 
@@ -54,7 +54,7 @@ export function renderDiagnostics(root: HTMLElement): Cleanup {
   root.innerHTML = `${topbar()}<main class="page"><div class="shell">
     <section class="card">
       <h1 style="font-size:36px">Diagnóstico</h1>
-      <p class="muted" style="margin:8px 0 16px">Mide en este teléfono cada pieza que necesita testigo. Pide cámara, ubicación y dos firmas; no envía ninguna transacción ni gasta nada.</p>
+      <p class="muted" style="margin:8px 0 16px">Mide en este teléfono cada pieza que necesita Proof of Cam. Pide cámara, ubicación y dos firmas; no envía ninguna transacción ni gasta nada.</p>
       <div class="actions"><button class="btn accent" id="run">${icon('lightning')}Probar todo</button><button class="btn" id="copy" disabled>${icon('copy')}Copiar reporte</button></div>
     </section>
     <section class="card"><div id="out">${`<div class="chk">${tag('idle')}<div><b>Sin ejecutar</b><p>Pulsa Probar todo.</p></div></div>`}</div></section>
@@ -180,7 +180,7 @@ export function renderDiagnostics(root: HTMLElement): Cleanup {
       for (const k of kinds) {
         await step(`Firma de un recibo (${label(k)})`, async () => {
           const a = authorFor(k);
-          const msg = utf8ToBytes(`testigo diagnóstico ${newId()}`);
+          const msg = utf8ToBytes(`proofofcam diagnóstico ${newId()}`);
           const sig = await signBytes(msg, a.kind);
           const ok = await verifyReceiptSig(msg, sig, a.pubkey);
           return [ok ? 'yes' : 'no', ok ? `firma válida de ${shortAddr(a.address)}` : 'la firma no verifica'];
@@ -189,7 +189,7 @@ export function renderDiagnostics(root: HTMLElement): Cleanup {
       if (!inside) {
         await step('Firma', async () => {
           const a = authorFor('app');
-          const msg = utf8ToBytes('testigo ensayo');
+          const msg = utf8ToBytes('proofofcam ensayo');
           const ok = await verifyReceiptSig(msg, await signBytes(msg, a.kind), a.pubkey);
           return [ok ? 'yes' : 'no', 'cuenta de ensayo (en Polkadot App firma la tuya)'];
         });
@@ -219,7 +219,7 @@ export function renderDiagnostics(root: HTMLElement): Cleanup {
           await askChainSubmit();
           const signer = txSignerFor(k);
           if (!signer) return ['no', 'sin firmante de transacciones'];
-          const tx = (await getClient()).getUnsafeApi().tx.System.remark({ remark: Binary.fromText('testigo diagnóstico') });
+          const tx = (await getClient()).getUnsafeApi().tx.System.remark({ remark: Binary.fromText('proofofcam diagnóstico') });
           const signed = await withTimeout(tx.sign(signer), HOST_SUBMIT_MS);
           if (signed === TIMED_OUT) return ['no', 'la firma no llegó a tiempo'];
           const o = signed as unknown as string | Uint8Array;
@@ -251,7 +251,7 @@ export function renderDiagnostics(root: HTMLElement): Cleanup {
     record('Guardar: mantener presionada', b.dataset.lp === 'yes' ? 'yes' : 'no', b.dataset.lp === 'yes' ? 'aparece "Guardar imagen"' : 'no aparece menú');
   }));
   copy.addEventListener('click', () => {
-    const txt = [`testigo diagnóstico ${new Date().toISOString()}`, navigator.userAgent, sdkLine(), '']
+    const txt = [`proofofcam diagnóstico ${new Date().toISOString()}`, navigator.userAgent, sdkLine(), '']
       .concat(lines.map(l => `[${l.status.toUpperCase().padEnd(4)}] ${l.name}${l.ms !== undefined ? ` (${l.ms} ms)` : ''}: ${l.detail}`))
       .join('\n');
     navigator.clipboard?.writeText(txt).then(() => toast('Reporte copiado'), () => toast('No se pudo copiar'));

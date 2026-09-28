@@ -1,12 +1,12 @@
 <div align="center">
 
-<img src="app/icon.png" width="96" alt="testigo" />
+<img src="app/icon.png" width="96" alt="Proof of Cam" />
 
-# testigo
+# Proof of Cam
 
 **Fotos con acta de nacimiento en Polkadot.**
 
-Cada foto que tomas con testigo sale firmada por ti, anclada a un bloque de
+Cada foto que tomas con Proof of Cam sale firmada por ti, anclada a un bloque de
 Asset Hub y con un QR para verificarla. La foto se queda en tu teléfono: en la
 cadena solo quedan sus huellas.
 
@@ -29,13 +29,13 @@ cadena solo quedan sus huellas.
 ## Qué es
 
 Hay cada vez más imágenes alteradas o generadas con IA, y detectarlas después
-es una carrera perdida. testigo va por el otro lado: le da a cada foto nueva un
+es una carrera perdida. Proof of Cam va por el otro lado: le da a cada foto nueva un
 **acta de nacimiento** verificable. Quién la tomó, cuándo y que no ha cambiado,
 sin entregarle la foto a nadie.
 
 Es un demo del stack de productos de Polkadot: corre dentro de Polkadot App (y
 Polkadot Desktop), firma con la identidad `.dot` del usuario y registra en un
-contrato de pallet-revive. Es hermano de [testalk](https://github.com/w3nerick/testalk),
+contrato de pallet-revive. Su nombre sigue a Proof of Talk, y es hermano de [testalk](https://github.com/w3nerick/testalk),
 que hace lo mismo con charlas.
 
 ## Cómo funciona
@@ -94,7 +94,7 @@ de fotos que no se tomaron aquí: es un acta de nacimiento, no un detector.
 ## Estructura
 
 ```
-testigo/
+proofofcam/
 ├── app/                      Interfaz (se publica en proofofcam.dot)
 │   ├── src/lib/
 │   │   ├── camera.ts         getUserMedia, un cuadro y apagado inmediato
@@ -152,7 +152,7 @@ npm run simulate  # instancia el bytecode real contra el devnet, sin firmar
 - **Ubicación:** en Android falla sin preguntar (#7, abierto; el WebView del host
   no implementa `onGeolocationPermissionsShowPrompt`).
 - **Selector de archivos:** la app Android lo implementó el 26 sep 2026 y ofrece
-  la cámara nativa, "igual que iOS". testigo no lo usa para sellar porque también
+  la cámara nativa, "igual que iOS". Proof of Cam no lo usa para sellar porque también
   deja elegir fotos de la galería.
 - **Protocolo:** la app habla el códec 1 (product-sdk-host 0.19.1), el de
   Polkadot Desktop 0.1.3. El códec 2 no es compatible con el 1 (RFC 0027); si un
@@ -164,7 +164,7 @@ npm run simulate  # instancia el bytecode real contra el devnet, sin firmar
 Project y WITNESS), [Capture / ProofSnap](https://captureapp.xyz/) (Numbers
 Protocol) y las Content Credentials C2PA del
 [Pixel 10](https://blog.google/security/pixel-android-trusted-images-c2pa-content-credentials/)
-firman fotos al tomarlas. testigo aporta una identidad humana legible (un
+firman fotos al tomarlas. Proof of Cam aporta una identidad humana legible (un
 username `.dot`, no una llave suelta), no pide instalar nada, vive dentro del
 wallet y se verifica con un QR en cualquier navegador.
 

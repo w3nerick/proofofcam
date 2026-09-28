@@ -40,7 +40,7 @@ const img1 = '0x' + 'ab'.repeat(32);
 const img2 = '0x' + 'cd'.repeat(32);
 const pub = '0x' + 'd4'.repeat(32);
 const sig = '0x' + '5a'.repeat(64);
-const receipt = toHex(new TextEncoder().encode('{"v":1,"app":"testigo","id":"k3m9x2qp7t4v8w1a"}'));
+const receipt = toHex(new TextEncoder().encode('{"v":1,"app":"proofofcam","id":"k3m9x2qp7t4v8w1a"}'));
 const ZERO16 = '0x' + '00'.repeat(16);
 let passed = 0;
 const ok = (name) => { passed++; console.log('  ✓', name); };

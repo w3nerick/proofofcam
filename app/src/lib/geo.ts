@@ -24,7 +24,7 @@ export function locationMaster(): Promise<Uint8Array> {
   master ??= (async () => {
     if (!isInsideContainerSync()) {
       // Ensayo en un navegador: llave fija y pública. Esas fotos no se sellan.
-      return blake2b(utf8ToBytes('testigo-ensayo-no-es-secreta'), { dkLen: 32 });
+      return blake2b(utf8ToBytes('proofofcam-ensayo-no-es-secreta'), { dkLen: 32 });
     }
     if (!(await waitForHost())) throw new Error('sin canal con el host');
     const r = await withTimeout(deriveEntropy(utf8ToBytes(ENTROPY_CONTEXT)), HOST_QUERY_MS);

@@ -1,6 +1,6 @@
 # Modelo de privacidad
 
-testigo parte de una regla: **probar sin exponer**. Cada dato que la app toca
+Proof of Cam parte de una regla: **probar sin exponer**. Cada dato que la app toca
 tiene que justificar por qué sale del teléfono; si no puede, no sale.
 
 ## Qué sale del teléfono y qué no
@@ -31,7 +31,7 @@ En el recibo público van dos cosas:
 
 - **`root`**: sha256 de cuatro compromisos, uno por nivel (región: 3
   caracteres, ciudad: 4, barrio: 6, punto: 8). Cada compromiso es
-  `sha256("testigo/loc/v1|nivel|prefijo|" ‖ sal)` con una sal de 32 bytes.
+  `sha256("proofofcam/loc/v1|nivel|prefijo|" ‖ sal)` con una sal de 32 bytes.
   Sin la sal no se puede comprobar ninguna ciudad candidata: probar todas las
   ciudades del mundo no sirve.
 - **`box`**: el geohash cifrado con XChaCha20-Poly1305.
@@ -65,7 +65,7 @@ que la identidad, pero nadie puede ligarla a un username. Para que siga así:
 ## Qué no protege
 
 - **La foto misma.** Si la foto muestra una cara, una placa o una calle, eso
-  viaja con ella a quien la compartas. testigo prueba su origen; no la anonimiza.
+  viaja con ella a quien la compartas. Proof of Cam prueba su origen; no la anonimiza.
 - **El host.** Polkadot App y Desktop ven lo que la app les pide firmar y la
   cámara que concedieron. Es el mismo modelo de confianza que el wallet.
 - **Correlación por tiempo.** El bloque del sello es público; quien vea que

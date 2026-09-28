@@ -5,7 +5,7 @@
  */
 export default {
   domain: 'proofofcam.dot',
-  displayName: 'testigo',
+  displayName: 'Proof of Cam',
   description: 'Fotos con acta de nacimiento: firmadas por ti, ancladas a Polkadot y verificables con un QR. La foto se queda en tu teléfono.',
   icon: { path: './icon.png', format: 'png' },
   executables: [

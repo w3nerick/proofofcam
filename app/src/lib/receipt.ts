@@ -19,7 +19,7 @@ export type Facing = 'back' | 'front' | 'unknown';
 
 export interface Receipt {
   v: 1;
-  app: 'testigo';
+  app: 'proofofcam';
   id: string;
   /** sha256 de los bytes exactos de la foto. */
   sha256: string;
@@ -82,7 +82,7 @@ export function parseReceipt(bytes: Uint8Array): Receipt | string {
     return 'no es JSON';
   }
   if (!r || typeof r !== 'object' || Array.isArray(r)) return 'no es un objeto';
-  if (r.v !== 1 || r.app !== 'testigo') return 'no es un recibo de Testigo v1';
+  if (r.v !== 1 || r.app !== 'proofofcam') return 'no es un recibo de Proof of Cam v1';
   if (typeof r.id !== 'string' || !isId(r.id)) return 'id inválido';
   if (typeof r.sha256 !== 'string' || !HEX32.test(r.sha256)) return 'huella exacta inválida';
   if (typeof r.dhash !== 'string' || !/^[0-9a-f]{16}$/.test(r.dhash)) return 'huella visual inválida';

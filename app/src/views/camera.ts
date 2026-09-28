@@ -94,7 +94,7 @@ export function renderCamera(root: HTMLElement): Cleanup {
     root.innerHTML = `<div class="cam">
       ${top()}
       <div class="cam-center">
-        <h1>Cámara testigo</h1>
+        <h1>Proof of Cam</h1>
         <p>La foto se toma aquí, se firma y se ancla a un bloque. No se sube a ningún lado: se queda en tu teléfono con un QR para verificarla.</p>
         ${error ? `<div class="note bad" style="text-align:left">${icon('warningCircle')}<span>${esc(error)}</span></div>` : ''}
         <button class="btn accent big" id="open">${icon('camera')}Encender cámara</button>
@@ -279,7 +279,7 @@ export function renderCamera(root: HTMLElement): Cleanup {
   function buildReceipt(author: Author): Receipt {
     return {
       v: 1,
-      app: 'testigo',
+      app: 'proofofcam',
       id: shot!.id,
       sha256: shot!.sha256,
       dhash: dhashHex(shot!.visual),

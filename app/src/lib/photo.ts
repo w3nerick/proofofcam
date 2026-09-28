@@ -26,7 +26,7 @@ export interface Shot {
   camera: Facing;
 }
 
-/** Tarjeta blanca con el QR y la palabra "testigo", abajo a la derecha. */
+/** Tarjeta blanca con el QR y el nombre de la app, abajo a la derecha. */
 export function drawStamp(canvas: HTMLCanvasElement, url: string): void {
   const ctx = canvas.getContext('2d')!;
   const qr = QRCode.create(url, { errorCorrectionLevel: 'M' });
@@ -55,7 +55,7 @@ export function drawStamp(canvas: HTMLCanvasElement, url: string): void {
   ctx.font = `700 ${Math.round(cell * 1.9)}px ui-monospace, "SF Mono", Menlo, monospace`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText('TESTIGO · VERIFICA', x + side / 2, y + side + label * 0.38);
+  ctx.fillText('PROOF OF CAM · VERIFICA', x + side / 2, y + side + label * 0.38);
   ctx.restore();
 }
 

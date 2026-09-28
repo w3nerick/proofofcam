@@ -1,9 +1,9 @@
 {
-  "name": "testigo-contract",
+  "name": "proofofcam-contract",
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "PhotoRegistry: actas de nacimiento de fotos de Testigo en Asset Hub (PolkaVM).",
+  "description": "PhotoRegistry: actas de nacimiento de fotos de Proof of Cam en Asset Hub (PolkaVM).",
   "scripts": {
     "build": "resolc --bin -O3 --output-dir out --overwrite contracts/PhotoRegistry.sol && npm run build:evm",
     "build:evm": "solc --abi --bin --optimize -o out-evm --overwrite contracts/PhotoRegistry.sol",

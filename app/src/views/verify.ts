@@ -255,7 +255,7 @@ export function renderActa(root: HTMLElement, id: string, locParam: string | nul
 export function renderFinder(root: HTMLElement): Cleanup {
   root.innerHTML = `${topbar()}<main class="page"><div class="shell">
     <section class="card"><h1 style="font-size:36px">Verificar una foto</h1>
-      <p class="muted" style="margin:8px 0 16px">Suelta la foto que recibiste. Si se tomó con testigo, encontramos su acta aunque haya perdido el QR o la haya recomprimido un chat.</p>
+      <p class="muted" style="margin:8px 0 16px">Suelta la foto que recibiste. Si se tomó con Proof of Cam, encontramos su acta aunque haya perdido el QR o la haya recomprimido un chat.</p>
       ${dropzone('Elegir la foto')}
       <div id="out" style="margin-top:12px"></div>
     </section>
@@ -270,7 +270,7 @@ export function renderFinder(root: HTMLElement): Cleanup {
     if (!registryDeployed()) return (out.innerHTML = row('warn', 'El registro de fotos todavía no está desplegado'));
     try {
       const h = await hashFile(f);
-      const exifNote = h.exif.gps ? ' Ojo: esta copia trae GPS en su EXIF (no viene de testigo, que siempre lo quita).' : '';
+      const exifNote = h.exif.gps ? ' Ojo: esta copia trae GPS en su EXIF (no viene de Proof of Cam, que siempre lo quita).' : '';
       const exact = await withReadClient(c => idOfImage(c, h.sha256));
       if (exact) {
         carried = { id: exact, file: h };
@@ -289,7 +289,7 @@ export function renderFinder(root: HTMLElement): Cleanup {
           `<a class="btn primary" href="#/f/${best.id}" style="margin-top:8px">${icon('shieldCheck')}Ver su acta</a>`;
         return;
       }
-      out.innerHTML = row('bad', 'Sin acta', `Esta imagen no se selló con testigo, o cambió demasiado (recorte, edición). Revisamos ${all.length} fotos selladas.${exifNote}`);
+      out.innerHTML = row('bad', 'Sin acta', `Esta imagen no se selló con Proof of Cam, o cambió demasiado (recorte, edición). Revisamos ${all.length} fotos selladas.${exifNote}`);
     } catch (e) {
       out.innerHTML = row('bad', 'No se pudo revisar', esc((e as Error).message));
     }
@@ -299,7 +299,7 @@ export function renderFinder(root: HTMLElement): Cleanup {
     ev.preventDefault();
     const v = root.querySelector<HTMLInputElement>('#idin')!.value.trim();
     const m = /([a-z2-7]{16})(?:\?loc=([\w-]+))?\s*$/.exec(v);
-    if (!m || !isId(m[1])) return toast('No encontré un id de testigo en eso');
+    if (!m || !isId(m[1])) return toast('No encontré un id de Proof of Cam en eso');
     location.hash = `#/f/${m[1]}${m[2] ? `?loc=${m[2]}` : ''}`;
   });
 
