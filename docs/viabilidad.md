@@ -1,13 +1,15 @@
 # ¿Es viable? ¿Para qué sirve?
 
-Estado al 28 sep 2026. Veredicto corto: **técnicamente viable**. En Polkadot
-Desktop funciona hoy; en el celular falta una prueba de cinco minutos que decide
-el resto.
+Estado al 28 sep 2026. Veredicto corto: **técnicamente viable, y probado en un
+iPhone**. La primera foto real se tomó y se selló desde Polkadot App en iOS:
+acta `ckaaqtce3u7gukpz`, bloque 13,814,797, verificada con `npm run verify`.
 
 ## Lo que está probado
 
 | Pieza | Evidencia |
 |---|---|
+| **Todo el flujo en iPhone** | Polkadot App iOS, 28 sep 2026: el host conecta con el códec 1, la cámara funciona dentro de la app, la firma y la transacción al contrato también. Acta `ckaaqtce3u7gukpz`: firma válida, coincide con su recibo, bloque previo #13,814,764 existe |
+| Cuenta de producto con saldo | En iOS, la cuenta de producto de `proofofcam.dot` ya tenía 5,000 PAS en el devnet: el modo seudónimo no necesitó faucet |
 | Contrato `PhotoRegistry` | Desplegado en el Asset Hub del devnet: `0xa0d30345400061439517417fc0a202adfe3ebb27`, bloque 13,812,904. Un sello simulado con un recibo de ~700 bytes pasa: depósito de 0.087 PAS y 6.8 G de peso |
 | Firma con la identidad `.dot` y transacción a un contrato desde una app | Probado en Polkadot Desktop 0.1.3 con [testalk](https://github.com/w3nerick/testalk) (27 y 28 sep 2026). Proof of Cam usa el mismo camino: [`firma-y-cuentas.md`](firma-y-cuentas.md) |
 | Cámara dentro de Polkadot App en Android | `getUserMedia` funciona dentro de un producto ([products-devnet-issues #7](https://github.com/Polkadot-Community-Foundation/products-devnet-issues/issues/7), Pixel 10 Pro XL, ago 2026); el host concede la cámara (`ProductWebChromeClient.onPermissionRequest` en la app Android) |
@@ -15,21 +17,21 @@ el resto.
 | Pruebas | App: 7 (ids, geohash, huellas, ubicación, recibo). Contrato: 15 en EVM local. Ambas en CI |
 | Sin Bulletin | El recibo va entero al contrato, así que el fallo de subida de archivos en Android ([#13](https://github.com/Polkadot-Community-Foundation/products-devnet-issues/issues/13)) no le afecta |
 
-## Lo que falta probar, del mayor riesgo al menor
+## Lo que falta probar
 
-1. **Protocolo del iPhone.** La app habla el códec 1 del protocolo host ↔ app,
-   el de Polkadot Desktop 0.1.3. El códec 2 no es compatible con el 1 (RFC 0027).
-   Si Polkadot App en iOS ya habla el 2, la app no conecta. Se arregla con una
-   versión con el SDK nuevo (product-sdk-host 0.20 o más). El diagnóstico lo
-   muestra como "no llegó a connected".
-2. **Cámara en iPhone dentro de Polkadot App.** El protocolo la contempla (el
-   contenedor de iOS intercepta cada `getUserMedia`, RFC 0002), pero nadie lo ha
-   medido.
-3. **Guardar la foto en la galería desde la app.** Hay tres caminos: la hoja de
-   compartir, la descarga y mantener presionada la foto. Basta con uno.
-4. **Ubicación.** Rota en Android (#7, el WebView del host no implementa el
+1. **Guardar la foto en la galería del iPhone.** En la primera prueba, la
+   descarga (`<a download>`) no descargó: el WebView abrió la imagen encima de la
+   app, sin forma de volver, y **la foto se perdió** (el acta quedó bien). Ahora
+   en iPhone no se ofrece la descarga; se guarda con la hoja de compartir o
+   manteniendo presionada la foto en un visor dentro de la app, y la app pide
+   confirmación antes de soltar una foto sin guardar. Falta confirmar en el iPhone
+   cuál de los dos caminos funciona.
+2. **Android.** Mismo código; la cámara ya está medida por otros (#7).
+3. **Ubicación.** Rota en Android (#7, el WebView del host no implementa el
    permiso de geolocalización) y sin medir en iOS. Es opcional: sin ella la app
    funciona igual.
+4. **Protocolo a futuro.** La app habla el códec 1. El códec 2 no es compatible
+   con el 1 (RFC 0027); cuando Polkadot App lo adopte, hará falta subir el SDK.
 
 Todo esto lo mide `#/diagnostico` en cada teléfono y deja un reporte copiable.
 
@@ -81,8 +83,8 @@ confía en el host.
 
 ## Plan
 
-1. **Deploy de la app** y `#/diagnostico` en un iPhone y en un Android. Decide
-   si hace falta la versión con el códec 2.
+1. ~~Deploy de la app y primera foto en iPhone~~ (hecho el 28 sep 2026).
+   Falta: confirmar cómo se guarda la foto en iPhone y probar en Android.
 2. **Prueba con gente real**, por ejemplo fotos del evento de la UANL: si los
    estudiantes entienden el QR y el acta sin explicación.
 3. **Individuality y Coinage** cuando estén en el devnet: alias de persona única

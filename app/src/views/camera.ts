@@ -22,7 +22,7 @@ import { subscribeFinalized, getClient, withReadClient, ASSET_HUB_GENESIS, NETWO
 import { connectWallet, authorFor, signBytes, txSignerFor, hasIdentity, isConnected, connectedUsername, identityUnavailableReason, modeOf, type Author } from '../lib/signer';
 import { askChainSubmit } from '../lib/permissions';
 import { registryDeployed, freeBalance, isMapped, mapAccount, simulateSeal, submitSeal, readPhoto, pas, type SealArgs } from '../lib/registry';
-import { sharePhoto, downloadPhoto, canShareFiles } from '../lib/save';
+import { sharePhoto, downloadPhoto, canShareFiles, isIOS } from '../lib/save';
 import { withTimeout, TIMED_OUT, describeError } from '../lib/host';
 import { APP_DOTNS, FAUCET_URL } from '../lib/network';
 import { esc, toast, copyText, fmtBlock, fmtBytes, shortAddr, shortHash, type Cleanup } from '../ui';
@@ -48,6 +48,8 @@ export function renderCamera(root: HTMLElement): Cleanup {
   let locNote = '';
   let chosen: 'identity' | 'app' = 'identity';
   let sealedBlock = 0;
+  /** La foto ya salió de la app (se compartió o la persona dijo que la guardó). */
+  let saved = false;
   let dead = false;
 
   let stopBlocks: (() => void) | null = null;
@@ -366,34 +368,83 @@ export function renderCamera(root: HTMLElement): Cleanup {
     phase = 'sealed';
     const link = verifyUrl(shot.id);
     const rehearsal = !inside;
+    const share = canShareFiles();
+    const ios = isIOS();
     root.innerHTML = `<div class="cam">
-      <div class="shot-wrap"><img src="${shot.url}" alt="Foto sellada. Mantén presionada para guardarla."></div>
+      <div class="shot-wrap"><img src="${shot.url}" alt="Foto sellada"></div>
       <div class="sheet">
         <div class="grab"></div>
         <span class="pill ${rehearsal ? '' : 'ok'}">${icon('sealFill')}${rehearsal ? 'Ensayo firmado' : `Sellada en el bloque ${fmtBlock(sealedBlock)}`}</span>
         <h2 style="margin-top:10px">Guárdala en tu teléfono</h2>
         <p class="muted" style="font-size:14px">Es la única copia: no está en ningún servidor ni en la cadena. ${shot.stamp ? 'El QR de la esquina lleva a su acta.' : ''}</p>
         <div class="actions" style="margin-top:14px">
-          ${canShareFiles() ? `<button class="btn accent block" id="share">${icon('shareNetwork')}Guardar o compartir</button>` : ''}
-          <button class="btn ${canShareFiles() ? 'ghost' : 'accent'} block" id="dl">${icon('downloadSimple')}Descargar</button>
+          <button class="btn accent block" id="save">${icon('downloadSimple')}${share ? 'Guardar en mi teléfono' : 'Ver la foto para guardarla'}</button>
+          ${share ? `<button class="btn ghost block" id="viewer">${icon('image')}Ver la foto para guardarla</button>` : ''}
+          ${ios ? '' : `<button class="btn ghost block" id="dl">${icon('downloadSimple')}Descargar archivo</button>`}
         </div>
-        <p class="faint" style="font-size:13px;margin-top:8px">¿No se guardó? Mantén presionada la foto de arriba y elige "Guardar imagen".</p>
+        <p class="faint" style="font-size:13px;margin-top:8px" id="save-note">${share ? 'Se abre la hoja del sistema: elige "Guardar imagen".' : 'Mantén presionada la foto y elige "Guardar imagen".'}</p>
         ${rehearsal ? '' : `<div class="actions" style="margin-top:14px">
           <button class="btn sm" id="copy-link">${icon('copy')}Copiar enlace del acta</button>
-          <a class="btn sm" href="#/f/${shot.id}">${icon('shieldCheck')}Ver el acta</a>
+          <button class="btn sm" id="acta">${icon('shieldCheck')}Ver el acta</button>
         </div>`}
         ${loc && !rehearsal ? revealBlock() : ''}
         <button class="btn ghost block" id="another" style="margin-top:16px">${icon('camera')}Tomar otra</button>
       </div>
     </div>`;
-    root.querySelector('#share')?.addEventListener('click', async () => {
+    const markSaved = () => {
+      saved = true;
+      const n = root.querySelector('#save-note');
+      if (n) n.innerHTML = `${icon('checkCircle')} Guardada. Ya puedes tomar otra.`;
+    };
+    root.querySelector('#save')!.addEventListener('click', async () => {
+      if (!share) return openViewer(markSaved);
       const r = await sharePhoto(shot!.blob, shot!.id);
-      if (r === 'unsupported') toast('Este contenedor no deja compartir archivos: usa Descargar o mantén presionada la foto');
+      if (r === 'shared') markSaved();
+      else if (r === 'unsupported') openViewer(markSaved);
     });
-    root.querySelector('#dl')!.addEventListener('click', () => { downloadPhoto(shot!.blob, shot!.id); toast('Descarga iniciada'); });
+    root.querySelector('#viewer')?.addEventListener('click', () => openViewer(markSaved));
+    root.querySelector('#dl')?.addEventListener('click', () => { downloadPhoto(shot!.blob, shot!.id); toast('Descarga iniciada: revisa tus descargas'); });
     root.querySelector('#copy-link')?.addEventListener('click', () => copyText(link, 'Enlace copiado'));
     root.querySelectorAll<HTMLButtonElement>('[data-level]').forEach(b => b.addEventListener('click', () => reveal(Number(b.dataset.level) as Level)));
-    root.querySelector('#another')!.addEventListener('click', () => { dropShot(); intro(); });
+    // Salir suelta la foto: si no se ha guardado, hay que confirmar con un segundo toque.
+    const guard = (el: HTMLButtonElement | null, go: () => void) => el?.addEventListener('click', () => {
+      if (saved || el.dataset.armed) return go();
+      el.dataset.armed = '1';
+      el.innerHTML = `${icon('warningCircle')}Aún no la guardas. Toca otra vez para salir sin ella`;
+      setTimeout(() => { if (!dead && el.isConnected) { delete el.dataset.armed; el.innerHTML = el.id === 'acta' ? `${icon('shieldCheck')}Ver el acta` : `${icon('camera')}Tomar otra`; } }, 4000);
+    });
+    guard(root.querySelector('#acta'), () => { location.hash = `#/f/${shot!.id}`; });
+    guard(root.querySelector('#another'), () => { dropShot(); intro(); });
+  }
+
+  /**
+   * Visor dentro de la app para guardar con el gesto del sistema. No navega a
+   * ningún lado: en iPhone, abrir la imagen en el WebView reemplazaba la app y
+   * la foto se perdía.
+   */
+  function openViewer(onSaved: () => void) {
+    if (!shot) return;
+    const v = document.createElement('div');
+    v.className = 'viewer';
+    v.setAttribute('role', 'dialog');
+    v.setAttribute('aria-label', 'Foto para guardar');
+    v.innerHTML = `
+      <button class="round viewer-close" aria-label="Cerrar">${icon('xCircle')}</button>
+      <img src="${shot.url}" alt="Foto sellada">
+      <div class="viewer-help">
+        <p>Mantén presionada la foto y elige <b>Guardar imagen</b> o <b>Guardar en Fotos</b>.</p>
+        <div class="actions" style="justify-content:center;margin-top:12px">
+          ${canShareFiles() ? `<button class="btn sm" id="v-share">${icon('shareNetwork')}Compartir</button>` : ''}
+          <button class="btn sm primary" id="v-done">${icon('checkCircle')}Ya la guardé</button>
+        </div>
+      </div>`;
+    const close = () => v.remove();
+    v.querySelector('.viewer-close')!.addEventListener('click', close);
+    v.querySelector('#v-done')!.addEventListener('click', () => { onSaved(); close(); });
+    v.querySelector('#v-share')?.addEventListener('click', async () => {
+      if ((await sharePhoto(shot!.blob, shot!.id)) === 'shared') { onSaved(); close(); }
+    });
+    root.querySelector('.cam')?.append(v);
   }
 
   function revealBlock(): string {
@@ -417,6 +468,7 @@ export function renderCamera(root: HTMLElement): Cleanup {
   function dropShot() {
     if (shot) URL.revokeObjectURL(shot.url);
     shot = null;
+    saved = false;
     loc = null;
     anchor = null;
   }

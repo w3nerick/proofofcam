@@ -230,3 +230,12 @@ p { margin: 0; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
+
+/* Visor para guardar la foto: dentro de la app, nunca navega. */
+.viewer { position: fixed; inset: 0; z-index: 20; background: #000; display: flex; flex-direction: column; padding: calc(12px + env(safe-area-inset-top)) 12px calc(16px + env(safe-area-inset-bottom)); }
+.viewer img { flex: 1; min-height: 0; width: 100%; object-fit: contain; -webkit-touch-callout: default; -webkit-user-select: auto; user-select: auto; }
+.viewer-close { position: absolute; top: calc(12px + env(safe-area-inset-top)); right: 12px; z-index: 1; width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; background: #ffffff26; border: 0; color: #fff; }
+.viewer-close .ico { width: 26px; height: 26px; }
+.viewer-help { color: #e8e5dd; text-align: center; font-size: 15px; padding-top: 12px; }
+.viewer .btn { border-color: #f4f2ec; color: #f4f2ec; }
+.viewer .btn.primary { background: #f4f2ec; color: #111; }

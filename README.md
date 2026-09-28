@@ -170,6 +170,7 @@ proofofcam/
 cd app && npm install
 npm test          # ids, geohash, huellas, ubicación y recibo
 npm run dev       # fuera de Polkadot App entra en modo ensayo: firma una cuenta de prueba y no sella
+npm run verify -- <id> [foto.jpg]   # verifica un acta sin la app: firma, identidad, bloque y archivo
 ```
 
 ```bash
@@ -193,10 +194,13 @@ npm run simulate  # instancia el bytecode real contra el devnet, sin firmar
 
 ## Lo que se sabe de la plataforma (28 sep 2026)
 
-- **Cámara en Polkadot App:** el protocolo tiene el permiso `Camera` (RFC 0002).
-  En Android, `getUserMedia` funciona dentro del producto
+- **iPhone: probado.** El 28 sep 2026 se tomó y selló la primera foto desde
+  Polkadot App en iOS (acta `ckaaqtce3u7gukpz`): el host habla el códec 1 y
+  la cámara, la firma y el contrato funcionan. La descarga con `<a download>`
+  **no** sirve ahí (abre la imagen encima de la app); se guarda compartiendo
+  o manteniendo presionada la foto.
+- **Cámara en Android:** `getUserMedia` funciona dentro del producto
   ([products-devnet-issues #7](https://github.com/Polkadot-Community-Foundation/products-devnet-issues/issues/7)).
-  En iPhone nadie lo ha medido: es lo primero que mide `#/diagnostico`.
 - **Ubicación:** en Android falla sin preguntar (#7, abierto; el WebView del host
   no implementa `onGeolocationPermissionsShowPrompt`).
 - **Selector de archivos:** la app Android lo implementó el 26 sep 2026 y ofrece

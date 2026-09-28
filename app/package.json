@@ -10,7 +10,8 @@
     "test": "node --test \"test/*.test.ts\"",
     "deploy": "npm run build && PAD_ENV=devnet pad dist proofofcam.dot",
     "check-deploy": "node scripts/check-deploy.ts",
-    "icon": "node scripts/icon.ts"
+    "icon": "node scripts/icon.ts",
+    "verify": "node scripts/verify.ts"
   },
   "dependencies": {
     "@fontsource-variable/dm-sans": "^5.3.0",

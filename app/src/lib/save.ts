@@ -2,14 +2,23 @@
  * Guardar la foto en el teléfono. Nada se sube: la foto sale de la app solo
  * hacia donde la persona elija.
  *
- * Dentro de Polkadot App no está medido qué funciona, así que se ofrecen tres
- * caminos y el diagnóstico mide cada uno: la hoja de compartir del sistema
- * (Web Share con archivos, "Guardar imagen"), la descarga, y mantener
- * presionada la foto en pantalla.
+ * Caminos: la hoja de compartir del sistema (Web Share con archivos, que en
+ * iPhone trae "Guardar imagen"), la descarga, y mantener presionada la foto en
+ * un visor dentro de la app.
+ *
+ * Medido en Polkadot App iOS (28 sep 2026): la descarga con `<a download>` no
+ * descarga. El WebView abre la imagen encima de la app, sin forma de volver, y
+ * la foto se pierde. Por eso en iPhone no se ofrece, y en todos lados el enlace
+ * de descarga abre aparte (`target=_blank`), nunca en lugar de la app.
  */
 export type SaveResult = 'shared' | 'cancelled' | 'unsupported' | 'downloaded';
 
 export const fileName = (id: string) => `proofofcam-${id}.jpg`;
+
+/** iPhone o iPad, incluido el iPad que se presenta como Mac. */
+export function isIOS(): boolean {
+  return /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.maxTouchPoints > 1 && /Mac/.test(navigator.platform));
+}
 
 export function canShareFiles(): boolean {
   try {
@@ -36,6 +45,8 @@ export function downloadPhoto(blob: Blob, id: string): SaveResult {
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = fileName(id);
+  a.target = '_blank';
+  a.rel = 'noopener';
   document.body.append(a);
   a.click();
   a.remove();
