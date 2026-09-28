@@ -9,12 +9,13 @@ acta `ckaaqtce3u7gukpz`, bloque 13,814,797, verificada con `npm run verify`.
 | Pieza | Evidencia |
 |---|---|
 | **Todo el flujo en iPhone** | Polkadot App iOS, 28 sep 2026: el host conecta con el códec 1, la cámara funciona dentro de la app, la firma y la transacción al contrato también. Acta `ckaaqtce3u7gukpz`: firma válida, coincide con su recibo, bloque previo #13,814,764 existe |
+| Marco con QR | La foto queda intacta y el QR va en una franja debajo. En Chrome: el QR se lee en el original y recomprimido, y la huella visual da 0 de 64 contra la copia entera, recomprimida al 30 % o sin el marco |
 | Huella visual con fotos reales | Una copia de una foto sellada, recomprimida al pasarla del iPhone a la Mac, da distancia 0 de 64 contra su acta. Otra toma de la misma escena da 14: "no es esta foto" |
 | Cuenta de producto con saldo | En iOS, la cuenta de producto de `proofofcam.dot` ya tenía 5,000 PAS en el devnet: el modo seudónimo no necesitó faucet |
 | Contrato `PhotoRegistry` | Desplegado en el Asset Hub del devnet: `0xa0d30345400061439517417fc0a202adfe3ebb27`, bloque 13,812,904. Un sello simulado con un recibo de ~700 bytes pasa: depósito de 0.087 PAS y 6.8 G de peso |
 | Firma con la identidad `.dot` y transacción a un contrato desde una app | Probado en Polkadot Desktop 0.1.3 con [testalk](https://github.com/w3nerick/testalk) (27 y 28 sep 2026). Proof of Cam usa el mismo camino: [`firma-y-cuentas.md`](firma-y-cuentas.md) |
 | Cámara dentro de Polkadot App en Android | `getUserMedia` funciona dentro de un producto ([products-devnet-issues #7](https://github.com/Polkadot-Community-Foundation/products-devnet-issues/issues/7), Pixel 10 Pro XL, ago 2026); el host concede la cámara (`ProductWebChromeClient.onPermissionRequest` en la app Android) |
-| La app completa en un navegador | Chrome con cámara simulada: la cámara se apaga al disparar; la foto sale sin EXIF; el QR estampado se lee en el original y en una copia recomprimida; la huella visual cambia 0–1 bits de 64 incluso reducida al 30 %; cero peticiones externas al abrir la app y al tomar una foto con ubicación |
+| La app completa en un navegador | Chrome con cámara simulada: la cámara se apaga al disparar; la foto sale sin EXIF; el QR del marco se lee en el original y en una copia recomprimida; la huella visual cambia 0–1 bits de 64 incluso reducida al 30 %; cero peticiones externas al abrir la app y al tomar una foto con ubicación |
 | Pruebas | App: 7 (ids, geohash, huellas, ubicación, recibo). Contrato: 15 en EVM local. Ambas en CI |
 | Sin Bulletin | El recibo va entero al contrato, así que el fallo de subida de archivos en Android ([#13](https://github.com/Polkadot-Community-Foundation/products-devnet-issues/issues/13)) no le afecta |
 
@@ -53,14 +54,14 @@ cámara de la laptop. Como demo es viable en cualquier escenario.
   el devnet no importa; en producción hay que decidir quién lo paga o si las
   actas caducan.
 - **Adopción.** Sirve si quien recibe la foto quiere verificarla. El QR
-  estampado baja la fricción, pero hay que explicarlo.
+  del marco baja la fricción, pero hay que explicarlo.
 
 ## Para qué sirve
 
 | Uso | Cómo se usa |
 |---|---|
 | **Periodismo y reportes ciudadanos** | Seudónimo, ubicación revelada solo a nivel ciudad. El acta prueba que la foto existía antes de que alguien diga que es falsa |
-| **Evidencia de eventos** (por ejemplo, la UANL) | Firma con identidad y QR en la foto: quien la vea en redes sabe quién la tomó y cuándo |
+| **Evidencia de eventos** (por ejemplo, la UANL) | Firma con identidad y marco con QR: quien la vea en redes sabe quién la tomó y cuándo |
 | **Seguros, peritajes, avance de obra** | Identidad y ubicación revelada al nivel "punto" solo a la aseguradora o al cliente; la cota de tiempo sale de la cadena, no del teléfono |
 | **Derechos humanos** | Seudónimo fondeado desde el faucet y ubicación apagada o a nivel región. Es el uso de ProofMode, con identidad opcional y verificación sin instalar nada |
 | **Fact-checking con Firefly** | Firefly (Parity) es verificación anónima de hechos por humanos verificados. Proof of Cam puede ser su cámara de evidencia; con alias de Individuality, cada foto la firmaría un humano real sin decir quién |

@@ -10,6 +10,8 @@ import { hexToU8a } from '@polkadot/util';
 import { icon } from '../lib/icons';
 import { isId } from '../lib/ids.ts';
 import { compareHashes, dhashHex, SIMILAR_MAX, hamming, isWeakVisual, type MatchKind } from '../lib/imagehash.ts';
+
+const nearest = (sealed: bigint, candidates: bigint[]) => Math.min(...candidates.map(c => hamming(sealed, c)));
 import { parseReceipt, verifyReceiptSig, addressOf, type Receipt } from '../lib/receipt.ts';
 import { LEVELS, decodeProof, verifyProof, openLocation, makeProof, encodeProof, type Level } from '../lib/loc.ts';
 import { hashFile, verifyUrl, type FileHashes } from '../lib/photo';
@@ -126,7 +128,7 @@ export function renderActa(root: HTMLElement, id: string, locParam: string | nul
         <dl class="kv">
           <dt>Tomada</dt><dd>entre el bloque ${fmtBlock(r.block.n)} y el ${fmtBlock(p.blockNumber)} (${window} bloques)</dd>
           <dt>Hora del teléfono</dt><dd>${esc(r.taken)} (UTC, la declara el teléfono)</dd>
-          <dt>QR en la foto</dt><dd>${r.stamp ? 'sí' : 'no'}</dd>
+          <dt>Marco con QR</dt><dd>${r.stamp ? 'sí (la foto va arriba, intacta)' : 'no'}</dd>
           <dt>Huella exacta</dt><dd class="mono">${esc(r.sha256)}</dd>
           <dt>Huella visual</dt><dd class="mono">${esc(r.dhash)}</dd>
           <dt>Firmó</dt><dd class="mono">${esc(addressOf(p.pubkey))}</dd>
@@ -289,12 +291,12 @@ export function renderFinder(root: HTMLElement): Cleanup {
         location.hash = `#/f/${exact}`;
         return;
       }
-      if (isWeakVisual(h.visual)) {
+      if (h.visual.every(isWeakVisual)) {
         out.innerHTML = row('warn', 'Sin acta para esta copia exacta', `Esta imagen tiene muy poco detalle para buscarla por parecido. Si tienes su enlace o el QR, úsalo.${exifNote}`);
         return;
       }
       const all = await withReadClient(c => allVisualHashes(c));
-      const best = all.filter(x => !isWeakVisual(x.visual)).map(x => ({ ...x, d: hamming(x.visual, h.visual) })).sort((a, b) => a.d - b.d)[0];
+      const best = all.filter(x => !isWeakVisual(x.visual)).map(x => ({ ...x, d: nearest(x.visual, h.visual) })).sort((a, b) => a.d - b.d)[0];
       if (best && best.d <= SIMILAR_MAX) {
         carried = { id: best.id, file: h };
         out.innerHTML = row(best.d <= 6 ? 'ok' : 'warn', 'Encontramos una foto sellada que se parece', `Diferencia visual ${best.d} de 64.${exifNote}`) +

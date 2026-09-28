@@ -1,12 +1,13 @@
 /**
- * De un cuadro de cámara a una foto sellable: QR estampado, JPEG y huellas.
+ * De un cuadro de cámara a una foto sellable: marco con QR, JPEG y huellas.
  *
- * El QR va dentro de la imagen, en una esquina, y apunta al acta de la foto:
- * viaja con ella aunque la reenvíen o le tomen captura de pantalla. Por eso el
- * id se genera antes del disparo y la huella se calcula después de estampar.
+ * La foto no se toca: el QR va en un marco tipo Polaroid debajo de ella y
+ * apunta a su acta, así viaja con la imagen aunque la reenvíen o le tomen
+ * captura. Por eso el id se genera antes del disparo y la huella exacta se
+ * calcula sobre el archivo con marco; la visual, solo sobre la foto.
  */
 import QRCode from 'qrcode';
-import { dhash64, sha256Hex } from './imagehash.ts';
+import { dhash64, sha256Hex, frameHeight, photoRowsOf } from './imagehash.ts';
 import { exifSummary, stripMetadata, type ExifSummary } from './jpeg.ts';
 
 export { exifSummary, stripMetadata, type ExifSummary };
@@ -29,37 +30,52 @@ export interface Shot {
   camera: Facing;
 }
 
-/** Tarjeta blanca con el QR y el nombre de la app, abajo a la derecha. */
-export function drawStamp(canvas: HTMLCanvasElement, url: string): void {
-  const ctx = canvas.getContext('2d')!;
-  const qr = QRCode.create(url, { errorCorrectionLevel: 'M' });
-  const n = qr.modules.size;
-  const quiet = 3;
-  const short = Math.min(canvas.width, canvas.height);
-  const cell = Math.max(5, Math.floor((short * 0.22) / (n + quiet * 2)));
-  const side = cell * (n + quiet * 2);
-  const label = Math.round(cell * 3.2);
-  const margin = Math.round(short * 0.025);
-  const x = canvas.width - side - margin;
-  const y = canvas.height - side - label - margin;
-  const r = cell * 1.5;
+/**
+ * Marco tipo Polaroid: la foto queda intacta y debajo va una franja con el QR
+ * de su acta, el nombre de la app, el id, la hora UTC del disparo y la
+ * invitación a verificarla. Solo lleva lo que se sabe antes de firmar: el
+ * bloque del sello se decide después.
+ */
+export function frameCanvas(photo: HTMLCanvasElement, id: string, takenUtc: string): HTMLCanvasElement {
+  const w = photo.width;
+  const band = frameHeight(w);
+  const out = document.createElement('canvas');
+  out.width = w;
+  out.height = photo.height + band;
+  const ctx = out.getContext('2d')!;
+  ctx.drawImage(photo, 0, 0);
+  ctx.fillStyle = '#faf9f5';
+  ctx.fillRect(0, photo.height, w, band);
 
-  ctx.save();
+  const pad = Math.round(band * 0.1);
+  const qr = QRCode.create(verifyUrl(id), { errorCorrectionLevel: 'M' });
+  const n = qr.modules.size + 4; // dos módulos de zona blanca por lado
+  const cell = Math.floor((band - pad * 2) / n);
+  const side = cell * n;
+  const qx = pad;
+  const qy = photo.height + Math.round((band - side) / 2);
   ctx.fillStyle = '#ffffff';
-  ctx.beginPath();
-  ctx.roundRect(x, y, side, side + label, r);
-  ctx.fill();
-  ctx.fillStyle = '#111111';
-  for (let row = 0; row < n; row++) {
-    for (let col = 0; col < n; col++) {
-      if (qr.modules.get(row, col)) ctx.fillRect(x + (col + quiet) * cell, y + (row + quiet) * cell, cell, cell);
+  ctx.fillRect(qx, qy, side, side);
+  ctx.fillStyle = '#141414';
+  for (let r = 0; r < qr.modules.size; r++) {
+    for (let c = 0; c < qr.modules.size; c++) {
+      if (qr.modules.get(r, c)) ctx.fillRect(qx + (c + 2) * cell, qy + (r + 2) * cell, cell, cell);
     }
   }
-  ctx.font = `700 ${Math.round(cell * 1.9)}px ui-monospace, "SF Mono", Menlo, monospace`;
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText('PROOF OF CAM · VERIFICA', x + side / 2, y + side + label * 0.38);
-  ctx.restore();
+
+  const tx = qx + side + Math.round(pad * 1.2);
+  const mono = 'ui-monospace, "SF Mono", Menlo, Consolas, monospace';
+  const line = (text: string, size: number, color: string, weight: number, y: number) => {
+    ctx.font = `${weight} ${Math.round(size)}px ${mono}`;
+    ctx.fillStyle = color;
+    ctx.textBaseline = 'alphabetic';
+    ctx.fillText(text, tx, photo.height + y, w - tx - pad);
+  };
+  line('PROOF OF CAM', band * 0.15, '#141414', 700, band * 0.3);
+  line(`Acta ${id}`, band * 0.095, '#56544e', 400, band * 0.5);
+  line(`Tomada ${takenUtc.replace('T', ' ').replace(/:\d\dZ$/, '')} UTC`, band * 0.095, '#56544e', 400, band * 0.66);
+  line('Escanea para verificar', band * 0.095, '#d6402a', 700, band * 0.84);
+  return out;
 }
 
 function toBlob(canvas: HTMLCanvasElement, type: string, quality: number): Promise<Blob> {
@@ -89,28 +105,33 @@ export async function pixelsOf(blob: Blob): Promise<{ data: Uint8ClampedArray; w
   return { data, w, h, origW, origH };
 }
 
-export async function finishShot(canvas: HTMLCanvasElement, o: { id: string; stamp: boolean; camera: Facing }): Promise<Shot> {
-  if (o.stamp) drawStamp(canvas, verifyUrl(o.id));
-  const bytes = stripMetadata(new Uint8Array(await (await toBlob(canvas, 'image/jpeg', 0.92)).arrayBuffer()));
+export async function finishShot(photo: HTMLCanvasElement, o: { id: string; stamp: boolean; camera: Facing; taken: string }): Promise<Shot> {
+  const out = o.stamp ? frameCanvas(photo, o.id, o.taken) : photo;
+  const bytes = stripMetadata(new Uint8Array(await (await toBlob(out, 'image/jpeg', 0.92)).arrayBuffer()));
   const blob = new Blob([bytes as Uint8Array<ArrayBuffer>], { type: 'image/jpeg' });
   const px = await pixelsOf(blob);
-  return {
+  // Huella visual solo de la foto: las filas de arriba, sin la franja del marco.
+  const rows = o.stamp ? Math.round(photo.height * (px.h / out.height)) : px.h;
+  const shot = {
     id: o.id,
     blob,
     bytes,
     url: URL.createObjectURL(blob),
     sha256: sha256Hex(bytes),
-    visual: dhash64(px.data, px.w, px.h),
-    w: canvas.width,
-    h: canvas.height,
+    visual: dhash64(px.data, px.w, rows),
+    w: out.width,
+    h: out.height,
     stamp: o.stamp,
     camera: o.camera,
   };
+  if (out !== photo) out.width = out.height = 0;
+  return shot;
 }
 
 export interface FileHashes {
   sha256: `0x${string}`;
-  visual: bigint;
+  /** Candidatas: la copia entera y, si puede traer marco, la copia sin la franja. */
+  visual: bigint[];
   w: number;
   h: number;
   size: number;
@@ -121,5 +142,8 @@ export interface FileHashes {
 export async function hashFile(file: Blob): Promise<FileHashes> {
   const bytes = new Uint8Array(await file.arrayBuffer());
   const px = await pixelsOf(file);
-  return { sha256: sha256Hex(bytes), visual: dhash64(px.data, px.w, px.h), w: px.origW, h: px.origH, size: bytes.length, exif: exifSummary(bytes) };
+  const visual = [dhash64(px.data, px.w, px.h)];
+  const rows = Math.round(photoRowsOf(px.origW, px.origH) * (px.h / px.origH));
+  if (rows >= 8 && frameHeight(px.origW) < px.origH) visual.push(dhash64(px.data, px.w, rows));
+  return { sha256: sha256Hex(bytes), visual, w: px.origW, h: px.origH, size: bytes.length, exif: exifSummary(bytes) };
 }

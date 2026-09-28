@@ -87,11 +87,26 @@ export function isWeakVisual(h: bigint): boolean {
   return Math.min(ones, 64 - ones) < WEAK_BELOW;
 }
 
+/**
+ * Marco con QR: una franja debajo de la foto, de alto proporcional al ancho.
+ * La huella visual se calcula solo sobre la foto, sin la franja, para que una
+ * copia a la que le recortaron el marco se siga reconociendo.
+ */
+export const FRAME_RATIO = 0.2;
+export const frameHeight = (width: number) => Math.round(width * FRAME_RATIO);
+/** Filas de foto de una imagen que trae el marco: todo menos la franja de abajo. */
+export const photoRowsOf = (width: number, height: number) => height - frameHeight(width);
+
+/**
+ * `copy.visual` puede traer varias candidatas (la copia entera y la copia sin
+ * la franja del marco): cuenta la más parecida.
+ */
 export function compareHashes(
   sealed: { sha256: string; visual: bigint },
-  copy: { sha256: string; visual: bigint },
+  copy: { sha256: string; visual: bigint | bigint[] },
 ): { kind: MatchKind; distance: number } {
-  const distance = hamming(sealed.visual, copy.visual);
+  const candidates = Array.isArray(copy.visual) ? copy.visual : [copy.visual];
+  const distance = Math.min(...candidates.map(v => hamming(sealed.visual, v)));
   if (sealed.sha256.toLowerCase() === copy.sha256.toLowerCase()) return { kind: 'exact', distance: 0 };
   if (isWeakVisual(sealed.visual)) return { kind: 'weak', distance };
   if (distance <= SAME_MAX) return { kind: 'same', distance };

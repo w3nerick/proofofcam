@@ -77,7 +77,7 @@ export function renderCamera(root: HTMLElement): Cleanup {
   const chips = () => `
     <div class="chips" role="group" aria-label="Opciones de la foto">
       <button class="chip${wantLocation ? ' on' : ''}" id="t-loc" aria-pressed="${wantLocation}">${icon(wantLocation ? 'mapPin' : 'eyeSlash')}${wantLocation ? 'Ubicación cifrada' : 'Sin ubicación'}</button>
-      <button class="chip${wantStamp ? ' on' : ''}" id="t-stamp" aria-pressed="${wantStamp}">${icon('qrCode')}${wantStamp ? 'QR en la foto' : 'Sin QR'}</button>
+      <button class="chip${wantStamp ? ' on' : ''}" id="t-stamp" aria-pressed="${wantStamp}">${icon('qrCode')}${wantStamp ? 'Marco con QR' : 'Sin QR'}</button>
     </div>`;
 
   const bindChips = () => {
@@ -171,7 +171,7 @@ export function renderCamera(root: HTMLElement): Cleanup {
     }
     root.innerHTML = `<div class="cam"><div class="cam-center"><i class="spin"></i><p>Preparando la foto…${wantLocation ? '<br>y pidiendo la ubicación (hasta 25 s)' : ''}</p></div></div>`;
     try {
-      shot = await finishShot(frame, { id: newId(), stamp: wantStamp, camera: facingNow });
+      shot = await finishShot(frame, { id: newId(), stamp: wantStamp, camera: facingNow, taken });
       frame.width = frame.height = 0;
     } catch (e) {
       return intro(`No se pudo preparar la foto: ${(e as Error).message}`);
@@ -376,7 +376,7 @@ export function renderCamera(root: HTMLElement): Cleanup {
         <div class="grab"></div>
         <span class="pill ${rehearsal ? '' : 'ok'}">${icon('sealFill')}${rehearsal ? 'Ensayo firmado' : `Sellada en el bloque ${fmtBlock(sealedBlock)}`}</span>
         <h2 style="margin-top:10px">Guárdala en tu teléfono</h2>
-        <p class="muted" style="font-size:14px">Es la única copia: no está en ningún servidor ni en la cadena. ${shot.stamp ? 'El QR de la esquina lleva a su acta.' : ''}</p>
+        <p class="muted" style="font-size:14px">Es la única copia: no está en ningún servidor ni en la cadena. ${shot.stamp ? 'El QR del marco lleva a su acta; la foto no se tocó.' : 'Sin QR: se verifica soltándola en «Verificar».'}</p>
         <div class="actions" style="margin-top:14px">
           <button class="btn accent block" id="save">${icon('downloadSimple')}${share ? 'Guardar en mi teléfono' : 'Ver la foto para guardarla'}</button>
           ${share ? `<button class="btn ghost block" id="viewer">${icon('image')}Ver la foto para guardarla</button>` : ''}

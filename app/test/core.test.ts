@@ -197,3 +197,23 @@ test('jpeg: se quitan EXIF, IPTC y comentarios; se conservan JFIF, perfil de col
   const notJpeg = new Uint8Array([1, 2, 3]);
   assert.equal(stripMetadata(notJpeg), notJpeg);
 });
+
+test('marco con QR: la huella visual es la de la foto, y el verificador la encuentra con o sin marco', async () => {
+  const { frameHeight, photoRowsOf, compareHashes: cmp } = await import('../src/lib/imagehash.ts');
+  // Foto vertical de iPhone 1440×2560 → marco de 288 px → archivo 1440×2848.
+  assert.equal(frameHeight(1440), 288);
+  assert.equal(photoRowsOf(1440, 2848), 2560);
+  // Copia reducida a la mitad por un chat: la proporción se mantiene.
+  assert.equal(photoRowsOf(720, 1424), 1280);
+  const w = 320, h = 240, band = frameHeight(w);
+  const photo = scene(w, h, 0);
+  const framed = new Uint8ClampedArray(w * (h + band) * 4).fill(250);
+  framed.set(photo);
+  const sealed = dhash64(framed, w, photoRowsOf(w, h + band));
+  assert.equal(sealed, dhash64(photo, w, h), 'la franja no entra en la huella');
+  const withFrame = [dhash64(framed, w, h + band), dhash64(framed, w, photoRowsOf(w, h + band))];
+  const cropped = [dhash64(photo, w, h)];
+  const exact = sha256Hex(new Uint8Array([7]));
+  assert.equal(cmp({ sha256: exact, visual: sealed }, { sha256: sha256Hex(new Uint8Array([8])), visual: withFrame }).distance, 0);
+  assert.equal(cmp({ sha256: exact, visual: sealed }, { sha256: sha256Hex(new Uint8Array([9])), visual: cropped }).distance, 0);
+});

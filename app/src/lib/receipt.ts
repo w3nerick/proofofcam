@@ -27,7 +27,7 @@ export interface Receipt {
   sha256: string;
   /** dHash de 64 bits, 16 caracteres hex. */
   dhash: string;
-  /** Si la foto lleva el QR estampado. */
+  /** Si la foto lleva el marco con QR. */
   stamp: boolean;
   /** Hora del disparo según el teléfono, UTC, sin milisegundos. La cadena da las cotas reales. */
   taken: string;

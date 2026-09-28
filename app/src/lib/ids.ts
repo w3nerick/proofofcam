@@ -1,7 +1,7 @@
 /**
  * Identificador de una foto: 16 caracteres base32 (80 bits al azar).
  *
- * Va en el QR estampado en la foto y es la llave del acta en el contrato: sus
+ * Va en el QR del marco de la foto y es la llave del acta en el contrato: sus
  * 16 bytes ASCII caben justo en un `bytes16`. Se genera antes del disparo
  * porque el QR forma parte de la imagen que se firma.
  */

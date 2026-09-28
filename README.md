@@ -20,7 +20,7 @@ cadena solo quedan sus huellas.
 <p align="center">
   <img src="docs/img/camara.png" width="24%" alt="Visor con el bloque de Asset Hub en vivo" />
   <img src="docs/img/revision.png" width="24%" alt="Revisión antes de sellar: tamaño sin EXIF, bloque previo y huella" />
-  <img src="docs/img/sellada.png" width="24%" alt="Foto sellada con el QR estampado y opciones para guardarla" />
+  <img src="docs/img/sellada.png" width="24%" alt="Foto sellada con su marco: QR, id del acta y hora, debajo de la foto intacta" />
   <img src="docs/img/ubicacion-oscuro.png" width="24%" alt="Ubicación cifrada, en modo oscuro" />
 </p>
 
@@ -61,7 +61,7 @@ En [`docs/viabilidad.md`](docs/viabilidad.md).
 
 ```mermaid
 flowchart LR
-    C[Cámara de la app] -->|un cuadro, sin EXIF| F[Foto + QR estampado]
+    C[Cámara de la app] -->|un cuadro, sin EXIF| F[Foto + marco con QR]
     B[(Asset Hub)] -->|último bloque| R
     F -->|sha256 + dHash| R[Recibo]
     R -->|firma sr25519<br/>identidad .dot o seudónimo| S[PhotoRegistry]
@@ -72,10 +72,12 @@ flowchart LR
 
 1. **Disparo.** La cámara se enciende dentro de la app y se apaga en el instante
    del disparo. El teléfono anota el último bloque finalizado de Asset Hub.
-2. **Foto.** El cuadro pasa por un canvas (pierde cualquier EXIF) y se le
-   estampa un QR con el enlace a su acta.
+2. **Foto.** El cuadro pasa por un canvas y se le quita cualquier metadato. La
+   foto no se toca: debajo se agrega un marco tipo Polaroid con el QR de su
+   acta, el id y la hora UTC (o nada, con "Sin QR").
 3. **Huellas.** sha256 del archivo (prueba igualdad exacta) y un dHash de 64
-   bits (reconoce la foto después de que un chat la recomprima).
+   bits solo de la foto, sin el marco: reconoce la foto después de que un chat
+   la recomprima o de que alguien le recorte el marco.
 4. **Recibo.** Id, huellas, bloque, hora UTC y, si se quiso, la ubicación
    cifrada. Se firma con la identidad `.dot` o con la cuenta de la app.
 5. **Sello.** El recibo entero va a `PhotoRegistry`: no caduca y no depende de
@@ -146,7 +148,7 @@ proofofcam/
 ├── app/                      Interfaz (se publica en proofofcam.dot)
 │   ├── src/lib/
 │   │   ├── camera.ts         getUserMedia, un cuadro y apagado inmediato
-│   │   ├── photo.ts          QR estampado, JPEG, huellas, detección de EXIF
+│   │   ├── photo.ts          Marco con QR, JPEG y huellas
 │   │   ├── imagehash.ts      sha256, dHash, comparación y huellas débiles
 │   │   ├── loc.ts            Ubicación: compromisos por nivel, cifrado, pruebas
 │   │   ├── geohash.ts        Coordenadas → celdas, sin servicios externos
