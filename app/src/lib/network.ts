@@ -34,10 +34,11 @@ export const APP_DOTNS = `${APP_LABEL}.dot`;
 export const WEB_GATEWAY = `https://${APP_LABEL}.dev-dot.li`;
 
 /**
- * PhotoRegistry en pallet-revive. Vacío hasta desplegarlo
- * (`cd contract && npm run deploy`); la app lo dice en pantalla en vez de fallar.
+ * PhotoRegistry en pallet-revive. Desplegado el 28 sep 2026, bloque 13,812,904
+ * (ver contract/deployments.json). Vacío = sin desplegar: la app lo dice en
+ * pantalla en vez de fallar.
  */
-export const REGISTRY_ADDRESS = '' as `0x${string}` | '';
+export const REGISTRY_ADDRESS = '0xa0d30345400061439517417fc0a202adfe3ebb27' as `0x${string}` | '';
 
 export const FAUCET_URL = 'https://faucet.polkadot.io';
 
