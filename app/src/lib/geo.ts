@@ -43,8 +43,17 @@ export interface Position {
   accuracy: number;
 }
 
+/**
+ * Posición actual, con un tope total. En Polkadot App iOS (28 sep 2026) la
+ * petición se quedó sin respuesta: sin tope, la foto se quedaba esperando.
+ */
 export async function currentPosition(timeoutMs = 20_000): Promise<Position> {
-  const answer = await askDevice('Location');
+  const total = new Promise<never>((_, reject) => setTimeout(() => reject(new Error('el teléfono no respondió la ubicación a tiempo')), timeoutMs + 5_000));
+  return Promise.race([total, position(timeoutMs)]);
+}
+
+async function position(timeoutMs: number): Promise<Position> {
+  const answer = await askDevice('Location', timeoutMs);
   if (answer === 'denied') throw new Error('Polkadot App no dio permiso de ubicación.');
   if (!navigator.geolocation) throw new Error('este contenedor no ofrece ubicación');
   return new Promise((resolve, reject) => {

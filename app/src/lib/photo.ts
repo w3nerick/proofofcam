@@ -7,6 +7,9 @@
  */
 import QRCode from 'qrcode';
 import { dhash64, sha256Hex } from './imagehash.ts';
+import { exifSummary, stripMetadata, type ExifSummary } from './jpeg.ts';
+
+export { exifSummary, stripMetadata, type ExifSummary };
 import { WEB_GATEWAY } from './network';
 import type { Facing } from './receipt.ts';
 
@@ -88,8 +91,8 @@ export async function pixelsOf(blob: Blob): Promise<{ data: Uint8ClampedArray; w
 
 export async function finishShot(canvas: HTMLCanvasElement, o: { id: string; stamp: boolean; camera: Facing }): Promise<Shot> {
   if (o.stamp) drawStamp(canvas, verifyUrl(o.id));
-  const blob = await toBlob(canvas, 'image/jpeg', 0.92);
-  const bytes = new Uint8Array(await blob.arrayBuffer());
+  const bytes = stripMetadata(new Uint8Array(await (await toBlob(canvas, 'image/jpeg', 0.92)).arrayBuffer()));
+  const blob = new Blob([bytes as Uint8Array<ArrayBuffer>], { type: 'image/jpeg' });
   const px = await pixelsOf(blob);
   return {
     id: o.id,
@@ -119,38 +122,4 @@ export async function hashFile(file: Blob): Promise<FileHashes> {
   const bytes = new Uint8Array(await file.arrayBuffer());
   const px = await pixelsOf(file);
   return { sha256: sha256Hex(bytes), visual: dhash64(px.data, px.w, px.h), w: px.origW, h: px.origH, size: bytes.length, exif: exifSummary(bytes) };
-}
-
-export interface ExifSummary {
-  exif: boolean;
-  gps: boolean;
-}
-
-/**
- * ¿El JPEG trae EXIF, y dentro de él GPS? Solo mira si están, no los lee: el
- * diagnóstico lo usa para contar qué deja pasar el sistema, sin mostrar datos.
- */
-export function exifSummary(bytes: Uint8Array): ExifSummary {
-  const out = { exif: false, gps: false };
-  if (bytes[0] !== 0xff || bytes[1] !== 0xd8) return out;
-  let i = 2;
-  while (i + 4 < bytes.length && i < 1 << 20) {
-    if (bytes[i] !== 0xff) break;
-    const marker = bytes[i + 1];
-    const len = (bytes[i + 2] << 8) | bytes[i + 3];
-    if (marker === 0xe1 && String.fromCharCode(...bytes.slice(i + 4, i + 8)) === 'Exif') {
-      out.exif = true;
-      // Etiqueta GPSInfo (0x8825) en cualquiera de los dos órdenes de bytes.
-      const seg = bytes.slice(i + 4, i + 2 + len);
-      for (let j = 0; j + 1 < seg.length; j++) {
-        if ((seg[j] === 0x88 && seg[j + 1] === 0x25) || (seg[j] === 0x25 && seg[j + 1] === 0x88)) {
-          out.gps = true;
-          break;
-        }
-      }
-    }
-    if (marker === 0xda) break;
-    i += 2 + len;
-  }
-  return out;
 }

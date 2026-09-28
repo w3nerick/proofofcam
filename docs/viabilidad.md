@@ -9,6 +9,7 @@ acta `ckaaqtce3u7gukpz`, bloque 13,814,797, verificada con `npm run verify`.
 | Pieza | Evidencia |
 |---|---|
 | **Todo el flujo en iPhone** | Polkadot App iOS, 28 sep 2026: el host conecta con el códec 1, la cámara funciona dentro de la app, la firma y la transacción al contrato también. Acta `ckaaqtce3u7gukpz`: firma válida, coincide con su recibo, bloque previo #13,814,764 existe |
+| Huella visual con fotos reales | Una copia de una foto sellada, recomprimida al pasarla del iPhone a la Mac, da distancia 0 de 64 contra su acta. Otra toma de la misma escena da 14: "no es esta foto" |
 | Cuenta de producto con saldo | En iOS, la cuenta de producto de `proofofcam.dot` ya tenía 5,000 PAS en el devnet: el modo seudónimo no necesitó faucet |
 | Contrato `PhotoRegistry` | Desplegado en el Asset Hub del devnet: `0xa0d30345400061439517417fc0a202adfe3ebb27`, bloque 13,812,904. Un sello simulado con un recibo de ~700 bytes pasa: depósito de 0.087 PAS y 6.8 G de peso |
 | Firma con la identidad `.dot` y transacción a un contrato desde una app | Probado en Polkadot Desktop 0.1.3 con [testalk](https://github.com/w3nerick/testalk) (27 y 28 sep 2026). Proof of Cam usa el mismo camino: [`firma-y-cuentas.md`](firma-y-cuentas.md) |

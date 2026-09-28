@@ -11,7 +11,7 @@ import { icon } from '../lib/icons';
 import { waitForHost, withTimeout, TIMED_OUT, describeError, HOST_QUERY_MS, HOST_SUBMIT_MS } from '../lib/host';
 import { subscribeFinalized, chainSource, getClient, withReadClient } from '../lib/chain';
 import { openCamera, grabFrame } from '../lib/camera';
-import { exifSummary } from '../lib/photo';
+import { exifSummary, stripMetadata } from '../lib/photo';
 import { currentPosition } from '../lib/geo';
 import { ENTROPY_CONTEXT, LEVELS, maxLevelFor } from '../lib/loc.ts';
 import { verifyReceiptSig } from '../lib/receipt.ts';
@@ -85,14 +85,15 @@ export function renderDiagnostics(root: HTMLElement): Cleanup {
     draw();
     copy.disabled = false;
   };
-  const step = async (name: string, fn: () => Promise<[Status, string]>) => {
+  /** Cada prueba tiene tope: una que se cuelga (la ubicación en iOS) no puede frenar las demás. */
+  const step = async (name: string, fn: () => Promise<[Status, string]>, ms = 60_000) => {
     if (dead) return;
     const l: Line = { name, status: 'run', detail: '…' };
     lines.push(l);
     draw();
     const t0 = performance.now();
     try {
-      const [status, detail] = await fn();
+      const [status, detail] = await Promise.race([fn(), new Promise<[Status, string]>(r => setTimeout(() => r(['no', `sin respuesta en ${ms / 1000} s`]), ms))]);
       Object.assign(l, { status, detail, ms: Math.round(performance.now() - t0) });
     } catch (e) {
       Object.assign(l, { status: 'no', detail: describeError(e instanceof Error ? e.message : e), ms: Math.round(performance.now() - t0) });
@@ -147,8 +148,11 @@ export function renderDiagnostics(root: HTMLElement): Cleanup {
           const res = `${frame.width}×${frame.height}`;
           const blob = await new Promise<Blob | null>(r => frame.toBlob(r, 'image/jpeg', 0.92));
           frame.width = frame.height = 0;
-          const ex = blob ? exifSummary(new Uint8Array(await blob.arrayBuffer())) : null;
-          return ['yes', `cámara ${cam.info.facing === 'back' ? 'trasera' : cam.info.facing} · visor ${cam.info.width}×${cam.info.height} · foto ${res}${cam.info.imageCapture ? ' (takePhoto)' : ''} · ${ex && !ex.exif ? 'sale sin EXIF' : 'TRAE EXIF'}`];
+          const raw = blob ? new Uint8Array(await blob.arrayBuffer()) : new Uint8Array();
+          const before = exifSummary(raw);
+          const after = exifSummary(stripMetadata(raw));
+          const exif = after.exif ? 'LA FOTO GUARDADA TRAE EXIF' : before.exif ? `el codificador agregó EXIF${before.gps ? ' con GPS' : ''}; la foto guardada sale sin él` : 'sale sin EXIF';
+          return [after.exif ? 'no' : 'yes', `cámara ${cam.info.facing === 'back' ? 'trasera' : cam.info.facing} · visor ${cam.info.width}×${cam.info.height} · foto ${res}${cam.info.imageCapture ? ' (takePhoto)' : ''} · ${exif}`];
         } finally {
           cam.stop();
         }
@@ -165,7 +169,7 @@ export function renderDiagnostics(root: HTMLElement): Cleanup {
       });
 
       await step('Ubicación', async () => {
-        const p = await currentPosition(20_000);
+        const p = await currentPosition(15_000);
         const max = maxLevelFor(p.accuracy);
         return ['yes', `llegó con precisión ±${Math.round(p.accuracy)} m → se podría revelar hasta "${LEVELS[max - 1].label}" (coordenadas no mostradas)`];
       });

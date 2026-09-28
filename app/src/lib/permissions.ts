@@ -35,10 +35,10 @@ export type DeviceAnswer = 'granted' | 'denied' | 'no-host' | 'timeout';
  * Pide al host un permiso de dispositivo. Fuera del contenedor no hay host y
  * decide el navegador: eso es `no-host`, no una negativa.
  */
-export async function askDevice(kind: 'Camera' | 'Location' | 'OpenUrl'): Promise<DeviceAnswer> {
+export async function askDevice(kind: 'Camera' | 'Location' | 'OpenUrl', ms = HOST_SUBMIT_MS): Promise<DeviceAnswer> {
   if (!isInsideContainerSync()) return 'no-host';
   if (!(await waitForHost())) return 'no-host';
-  const r = await withTimeout(requestDevicePermission(kind), HOST_SUBMIT_MS).catch(() => null);
+  const r = await withTimeout(requestDevicePermission(kind), ms).catch(() => null);
   if (r === TIMED_OUT) return 'timeout';
   if (!r || !r.ok) return 'no-host';
   return r.value === false ? 'denied' : 'granted';

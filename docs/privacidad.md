@@ -8,7 +8,7 @@ tiene que justificar por qué sale del teléfono; si no puede, no sale.
 | Dato | ¿Sale? | Cómo |
 |---|---|---|
 | La foto | **No** | Se queda en memoria hasta que la guardas; al salir de la pantalla se suelta la URL local |
-| EXIF (GPS, modelo, serie) | **No existe** | La foto pasa por un canvas, que no copia metadatos. El diagnóstico lo comprueba en cada teléfono |
+| EXIF (GPS, modelo, serie) | **No** | La foto pasa por un canvas, que no conoce el GPS ni la cámara. El codificador de Apple igual agrega un EXIF mínimo (espacio de color y tamaño) y un bloque IPTC; la app quita todo bloque de metadatos antes de calcular la huella (`jpeg.ts`). El diagnóstico lo comprueba en cada teléfono |
 | Huella exacta (sha256) | Sí, al contrato | No permite reconstruir la foto; solo confirmar una copia idéntica |
 | Huella visual (dHash, 64 bits) | Sí, al contrato | Resume una cuadrícula de 9×8 tonos; no permite reconstruir nada reconocible |
 | Hora | Sí, en UTC y sin milisegundos | Sin zona horaria, que revelaría la región |

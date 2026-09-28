@@ -171,3 +171,29 @@ test('recibo: bytes estables, firma sr25519 válida y cualquier cambio la rompe'
   assert.equal(parseReceipt(new TextEncoder().encode('{"v":2}')), 'no es un recibo de Proof of Cam v1');
   assert.equal(typeof parseReceipt(receiptBytes({ ...r, id: 'mal' })), 'string');
 });
+
+test('jpeg: se quitan EXIF, IPTC y comentarios; se conservan JFIF, perfil de color y la imagen', async () => {
+  const { stripMetadata, exifSummary } = await import('../src/lib/jpeg.ts');
+  const seg = (m: number, body: number[]) => [0xff, m, (body.length + 2) >> 8, (body.length + 2) & 0xff, ...body];
+  const ascii = (t: string) => [...t].map(c => c.charCodeAt(0));
+  const jpeg = new Uint8Array([
+    0xff, 0xd8,
+    ...seg(0xe0, [...ascii('JFIF'), 0, 1, 1, 0, 0, 1, 0, 1, 0, 0]),
+    ...seg(0xe1, [...ascii('Exif'), 0, 0, 0x4d, 0x4d, 0x88, 0x25, 1, 2, 3]), // con etiqueta GPSInfo
+    ...seg(0xed, ascii('Photoshop 3.0')),
+    ...seg(0xe2, ascii('ICC_PROFILE')),
+    ...seg(0xfe, ascii('comentario')),
+    ...seg(0xdb, [0, 1, 2, 3]),
+    0xff, 0xda, 0, 4, 9, 9, 0x12, 0x34, 0xff, 0xd9,
+  ]);
+  assert.deepEqual(exifSummary(jpeg), { exif: true, gps: true });
+  const clean = stripMetadata(jpeg);
+  assert.deepEqual(exifSummary(clean), { exif: false, gps: false });
+  const text = new TextDecoder('latin1').decode(clean);
+  for (const kept of ['JFIF', 'ICC_PROFILE']) assert.ok(text.includes(kept), `conserva ${kept}`);
+  for (const gone of ['Exif', 'Photoshop', 'comentario']) assert.ok(!text.includes(gone), `quita ${gone}`);
+  assert.deepEqual([...clean.slice(-10)], [0xff, 0xda, 0, 4, 9, 9, 0x12, 0x34, 0xff, 0xd9], 'la imagen queda intacta');
+  assert.deepEqual(stripMetadata(clean), clean, 'idempotente');
+  const notJpeg = new Uint8Array([1, 2, 3]);
+  assert.equal(stripMetadata(notJpeg), notJpeg);
+});

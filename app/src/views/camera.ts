@@ -169,7 +169,7 @@ export function renderCamera(root: HTMLElement): Cleanup {
       // Apagada en el instante del disparo: el indicador del sistema también.
       stopCamera();
     }
-    root.innerHTML = `<div class="cam"><div class="cam-center"><i class="spin"></i><p>Preparando la foto…</p></div></div>`;
+    root.innerHTML = `<div class="cam"><div class="cam-center"><i class="spin"></i><p>Preparando la foto…${wantLocation ? '<br>y pidiendo la ubicación (hasta 25 s)' : ''}</p></div></div>`;
     try {
       shot = await finishShot(frame, { id: newId(), stamp: wantStamp, camera: facingNow });
       frame.width = frame.height = 0;
