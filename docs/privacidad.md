@@ -14,12 +14,21 @@ tiene que justificar por qué sale del teléfono; si no puede, no sale.
 | Hora | Sí, en UTC y sin milisegundos | Sin zona horaria, que revelaría la región |
 | Bloque previo | Sí | Es la cota inferior de tiempo; es público por naturaleza |
 | Quién | Username `.dot` **o** nada | En modo seudónimo firma la cuenta de producto de la app |
-| Cámara | Solo "trasera" o "frontal" | Sin nombre ni id del dispositivo |
+| Resolución, tamaño, cámara | **No** | Dirían qué teléfono es, y quien tenga la foto los lee de ella. Una prueba del repo falla si vuelven al recibo |
 | Ubicación | Solo si la activas, y nunca en claro | Ver abajo |
 
-La app no tiene servidor, no carga fuentes ni scripts de terceros y no usa
-analítica. Las únicas conexiones son a la cadena (por el host, o a RPC públicos
-de respaldo) y, si el usuario lo pide, a OpenStreetMap para ver una zona.
+La app no tiene servidor, no carga fuentes ni scripts de terceros, no guarda
+nada en el navegador (ni `localStorage` ni cookies) y no usa analítica. Medido
+el 28 sep 2026 con Chrome: abrir la app hace **cero** peticiones externas, y
+tomar una foto con ubicación tampoco. Las únicas conexiones son a la cadena y,
+si el usuario lo pide, a OpenStreetMap para ver una zona.
+
+**Por dónde se lee la cadena.** Dentro de Polkadot App, Polkadot Desktop o el
+gateway `.dev-dot.li`, por el cliente ligero del host: sin un intermediario que
+vea qué consultas. En un navegador normal, o si el host falla, por un RPC
+público: su operador ve la IP y qué acta se consulta. El acta dice en cada caso
+por dónde se consultó. El fragmento del enlace (`#/f/<id>?loc=…`) nunca llega a
+ningún servidor, ni siquiera al gateway.
 
 ## Ubicación por niveles
 
@@ -52,10 +61,19 @@ Si el GPS es impreciso, la app no deja prometer más de lo que sabe: con ±500 m
 el nivel "punto" no se puede revelar. Los niveles imposibles se rellenan con
 valores derivados de la llave, indistinguibles de un compromiso real.
 
+## El registro es público
+
+`PhotoRegistry` no tiene dueño, administrador ni forma de borrar o censurar un
+acta. La otra cara es que es público: cualquiera puede listar las actas, y con
+ellas cuántas fotos firmó una identidad y cuándo (no qué fotos: sin la foto, las
+huellas no dicen nada). Si no quieres eso, usa el seudónimo.
+
 ## Seudónimo
 
 La cuenta de producto que el host deriva para `proofofcam.dot` firma igual
-que la identidad, pero nadie puede ligarla a un username. Para que siga así:
+que la identidad, pero nadie puede ligarla a un username. Lo que sí queda ligado
+es una foto seudónima con otra: comparten llave y la misma cuenta paga. Para que
+el seudónimo siga sin ligarse a tu nombre:
 
 - **Paga su propia transacción.** Si la pagara la identidad, la transacción
   misma diría de quién es. Por eso necesita su propio saldo.
@@ -73,5 +91,21 @@ que la identidad, pero nadie puede ligarla a un username. Para que siga así:
   pero no lo elimina.
 - **La llave raíz.** Si alguien obtiene tu frase semilla puede derivar la
   llave de ubicación y abrir todas tus ubicaciones selladas.
+- **El servicio de ubicación del sistema.** Al activar la ubicación, el
+  teléfono puede consultar a Apple o Google para calcularla. Eso pasa fuera de
+  la app; por eso viene apagada.
 - **El agujero analógico.** Una foto de una pantalla queda firmada como
   cualquier otra. La firma prueba quién y cuándo, no que la escena sea real.
+
+## Lo que falta para cerrar los huecos
+
+Dos piezas del stack de Polkadot resuelven lo que hoy queda abierto. Ninguna
+funciona todavía en el devnet:
+
+- **Alias de persona única** (Individuality, ring-VRF sobre Bandersnatch;
+  `create_account_proof`, RFC 0004). Firmar como "un humano verificado",
+  distinto en cada contexto: prueba que la foto no la sacó un bot, sin decir
+  quién ni ligar una foto con otra. Es el seudónimo ideal.
+- **Pagos con Coinage** (RFC 0017). El sello lo pagaría una moneda que no
+  deja rastro de quién la gastó, así la cuenta que paga dejaría de ligar las
+  fotos seudónimas entre sí.

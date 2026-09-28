@@ -57,6 +57,7 @@ export function renderDiagnostics(root: HTMLElement): Cleanup {
       <p class="muted" style="margin:8px 0 16px">Mide en este teléfono cada pieza que necesita Proof of Cam. Pide cámara, ubicación y dos firmas; no envía ninguna transacción ni gasta nada.</p>
       <div class="actions"><button class="btn accent" id="run">${icon('lightning')}Probar todo</button><button class="btn" id="copy" disabled>${icon('copy')}Copiar reporte</button></div>
     </section>
+    <p class="faint" style="font-size:13px">El reporte solo sale si lo copias. Lleva la versión de tu navegador y el resultado de cada prueba; no lleva ubicación, fotos ni direcciones completas.</p>
     <section class="card"><div id="out">${`<div class="chk">${tag('idle')}<div><b>Sin ejecutar</b><p>Pulsa Probar todo.</p></div></div>`}</div></section>
     <section class="card">
       <h3>Guardar la foto en el teléfono</h3>

@@ -13,7 +13,7 @@ import { compareHashes, dhashHex, SIMILAR_MAX, hamming, isWeakVisual, type Match
 import { parseReceipt, verifyReceiptSig, addressOf, type Receipt } from '../lib/receipt.ts';
 import { LEVELS, decodeProof, verifyProof, openLocation, makeProof, encodeProof, type Level } from '../lib/loc.ts';
 import { hashFile, verifyUrl, type FileHashes } from '../lib/photo';
-import { withReadClient, hashAtHeight, ASSET_HUB_GENESIS } from '../lib/chain';
+import { withReadClient, hashAtHeight, chainSource, ASSET_HUB_GENESIS } from '../lib/chain';
 import { readPhoto, idOfImage, allVisualHashes, registryDeployed, type OnChainPhoto } from '../lib/registry';
 import { usernameOwner } from '../lib/people';
 import { locationMaster } from '../lib/geo';
@@ -66,6 +66,17 @@ function matchRow(kind: MatchKind, distance: number): string {
   return row(tone, title, `${detail}${kind === 'exact' || kind === 'weak' ? '' : ` Diferencia visual: ${distance} de 64.`}`);
 }
 
+/**
+ * Por dónde se leyó la cadena, dicho sin rodeos: dentro de Polkadot App es el
+ * cliente ligero del host; fuera, un RPC público que ve la IP y qué acta se
+ * consulta.
+ */
+function sourceNote(): string {
+  const { source } = chainSource();
+  if (source === 'host') return 'el cliente ligero de Polkadot App, sin intermediarios';
+  return 'un RPC público: su operador puede ver tu IP y qué acta consultaste. Dentro de Polkadot App o en el gateway .dev-dot.li se usa un cliente ligero';
+}
+
 // ─────────────────────────────── acta ───────────────────────────────
 
 export function renderActa(root: HTMLElement, id: string, locParam: string | null): Cleanup {
@@ -115,12 +126,12 @@ export function renderActa(root: HTMLElement, id: string, locParam: string | nul
         <dl class="kv">
           <dt>Tomada</dt><dd>entre el bloque ${fmtBlock(r.block.n)} y el ${fmtBlock(p.blockNumber)} (${window} bloques)</dd>
           <dt>Hora del teléfono</dt><dd>${esc(r.taken)} (UTC, la declara el teléfono)</dd>
-          <dt>Cámara</dt><dd>${r.camera === 'back' ? 'trasera' : r.camera === 'front' ? 'frontal' : 'desconocida'} · ${r.w}×${r.h} · ${fmtBytes(r.size)}</dd>
           <dt>QR en la foto</dt><dd>${r.stamp ? 'sí' : 'no'}</dd>
           <dt>Huella exacta</dt><dd class="mono">${esc(r.sha256)}</dd>
           <dt>Huella visual</dt><dd class="mono">${esc(r.dhash)}</dd>
           <dt>Firmó</dt><dd class="mono">${esc(addressOf(p.pubkey))}</dd>
           <dt>Red</dt><dd>${esc(r.net)}</dd>
+          <dt>Consultado por</dt><dd>${sourceNote()}</dd>
         </dl>
       </section>
       <p class="faint" style="font-size:13px">La foto no está en la cadena: solo sus huellas. Que el acta sea válida prueba quién la tomó, cuándo y que no cambió; no prueba que la escena sea real.</p>
@@ -190,7 +201,8 @@ export function renderActa(root: HTMLElement, id: string, locParam: string | nul
 
   function showCompare(h: FileHashes, p: OnChainPhoto) {
     const m = compareHashes({ sha256: p.imageHash, visual: p.visualHash }, { sha256: h.sha256, visual: h.visual });
-    root.querySelector('#cmp')!.innerHTML = matchRow(m.kind, m.distance);
+    root.querySelector('#cmp')!.innerHTML = matchRow(m.kind, m.distance) +
+      `<p class="faint" style="font-size:13px">Tu copia: ${h.w}×${h.h} · ${fmtBytes(h.size)}${h.exif.gps ? ' · trae GPS en su EXIF: no viene tal cual de Proof of Cam' : ''}.</p>`;
   }
 
   function drawLocation(p: OnChainPhoto, r: Receipt) {

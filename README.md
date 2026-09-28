@@ -74,11 +74,39 @@ flowchart LR
 | Firma, bloque previo, hora UTC | Contrato |
 | Nombre | Username `.dot` comprobado en People chain, **o nada** (modo seudónimo) |
 | Ubicación | Apagada por defecto. Si se activa: cuatro compromisos y el geohash cifrado; el dueño revela un nivel a la vez |
-| Modelo de teléfono, sistema, zona horaria, EXIF | En ningún lado |
+| Resolución, cámara, modelo de teléfono, sistema, zona horaria, EXIF | En ningún lado |
 
 La llave de la ubicación no se guarda: el host la deriva de la cuenta del
 usuario para esta app (`deriveEntropy`, RFC 0007). Detalle y modelo de amenazas
 en [`docs/privacidad.md`](docs/privacidad.md).
+
+## Principios
+
+**Cypherpunk.** "La privacidad es el poder de revelarse al mundo de forma
+selectiva" (Hughes, 1993). Aquí eso es literal:
+- **Revelar solo lo necesario.** La foto la muestra quien quiere. La ubicación
+  se revela por niveles y solo por su dueño. El recibo lleva lo justo para
+  verificar.
+- **Anonimato posible.** Se puede firmar con un seudónimo que nadie liga a tu nombre.
+- **Sin terceros de confianza.** No hay servidor. La firma se verifica en el
+  navegador de quien mira y los bloques en la cadena. El contrato no tiene dueño
+  y nadie puede borrar un acta.
+- **Código que se puede auditar.** Licencia MIT, y el deploy se compara byte
+  por byte con el build (`npm run check-deploy`).
+
+**La visión de Polkadot.** Es un *producto* dentro del *host* (la arquitectura
+Triangle):
+- Firma con la identidad de Polkadot App: sin extensiones y con las llaves en el
+  teléfono.
+- Lee la cadena por el cliente ligero del host.
+- Deriva sus llaves con `deriveEntropy` (RFC 0007), sin guardar secretos.
+- Pide permisos solo al usarlos (RFC 0002).
+- Vive en un nombre `.dot` y registra en Polkadot Hub (pallet-revive).
+- "Hacer que lo correcto sea lo fácil": el usuario toma una foto; la criptografía
+  no se ve.
+
+Lo que falta para cerrar los huecos (alias de persona única con Individuality y
+pagos sin rastro con Coinage) está en [`docs/privacidad.md`](docs/privacidad.md).
 
 ## Qué prueba y qué no
 

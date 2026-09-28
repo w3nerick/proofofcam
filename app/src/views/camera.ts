@@ -204,10 +204,10 @@ export function renderCamera(root: HTMLElement): Cleanup {
     return `<div class="mode-pick" role="radiogroup" aria-label="Firmar como">
       <label${idOk ? '' : ' style="opacity:.5"'}><input type="radio" name="mode" value="identity" ${chosen === 'identity' ? 'checked' : ''} ${idOk ? '' : 'disabled'}>
         <span><b>${icon('user')} Con mi identidad</b> <span class="mono">${esc(connectedUsername() ?? '')}</span>
-        <small>${idOk ? 'Quien verifique verá tu username, comprobado en People chain.' : esc(`No disponible: ${identityUnavailableReason() ?? 'sin identidad'}.`)}</small></span></label>
+        <small>${idOk ? 'Quien verifique verá tu username, comprobado en People chain. El registro es público: cualquiera puede ver cuántas fotos firmó tu nombre y cuándo.' : esc(`No disponible: ${identityUnavailableReason() ?? 'sin identidad'}.`)}</small></span></label>
       <label><input type="radio" name="mode" value="app" ${chosen === 'app' ? 'checked' : ''}>
         <span><b>${icon('detective')} Con seudónimo</b>
-        <small>Firma la cuenta de esta app: nadie puede ligarla a tu nombre. Paga su propia transacción, así que necesita su propio saldo.</small></span></label>
+        <small>Firma la cuenta de esta app: nadie puede ligarla a tu nombre. Tus fotos con seudónimo sí quedan ligadas entre sí. Paga su propia transacción, así que necesita su propio saldo.</small></span></label>
     </div>`;
   }
 
@@ -283,12 +283,7 @@ export function renderCamera(root: HTMLElement): Cleanup {
       id: shot!.id,
       sha256: shot!.sha256,
       dhash: dhashHex(shot!.visual),
-      w: shot!.w,
-      h: shot!.h,
-      type: 'image/jpeg',
-      size: shot!.bytes.length,
       stamp: shot!.stamp,
-      camera: shot!.camera,
       taken,
       block: { n: anchor!.number, hash: anchor!.hash },
       ...(loc ? { loc: loc.sealed } : {}),

@@ -1,8 +1,10 @@
 /**
- * El recibo de una foto: lo que se firma y lo que queda en la cadena.
+ * El recibo de una foto: lo que se firma y lo que queda en la cadena para
+ * siempre.
  *
- * Lleva lo mínimo para verificar la foto y nada para rastrear a quien la tomó:
- * ni modelo del teléfono, ni sistema, ni zona horaria (la hora va en UTC), ni
+ * Lleva solo lo necesario para verificar la foto y nada que ayude a rastrear a
+ * quien la tomó: ni resolución, tamaño o cámara (dirían qué teléfono es y se
+ * leen de la foto misma), ni sistema, ni zona horaria (la hora va en UTC), ni
  * coordenadas (la ubicación, si se activa, va como compromisos y cifrada).
  *
  * Los bytes que se firman son exactamente los que se guardan en el contrato,
@@ -25,13 +27,8 @@ export interface Receipt {
   sha256: string;
   /** dHash de 64 bits, 16 caracteres hex. */
   dhash: string;
-  w: number;
-  h: number;
-  type: string;
-  size: number;
   /** Si la foto lleva el QR estampado. */
   stamp: boolean;
-  camera: Facing;
   /** Hora del disparo según el teléfono, UTC, sin milisegundos. La cadena da las cotas reales. */
   taken: string;
   /** Último bloque finalizado que vio el teléfono antes del disparo. */
@@ -52,12 +49,7 @@ export function receiptBytes(r: Receipt): Uint8Array {
     id: r.id,
     sha256: r.sha256,
     dhash: r.dhash,
-    w: r.w,
-    h: r.h,
-    type: r.type,
-    size: r.size,
     stamp: r.stamp,
-    camera: r.camera,
     taken: r.taken,
     block: { n: r.block.n, hash: r.block.hash },
     ...(r.loc ? { loc: { root: r.loc.root, box: r.loc.box } } : {}),
@@ -86,8 +78,7 @@ export function parseReceipt(bytes: Uint8Array): Receipt | string {
   if (typeof r.id !== 'string' || !isId(r.id)) return 'id inválido';
   if (typeof r.sha256 !== 'string' || !HEX32.test(r.sha256)) return 'huella exacta inválida';
   if (typeof r.dhash !== 'string' || !/^[0-9a-f]{16}$/.test(r.dhash)) return 'huella visual inválida';
-  for (const k of ['w', 'h', 'size']) if (!Number.isInteger(r[k])) return `"${k}" no es entero`;
-  for (const k of ['type', 'taken', 'who', 'mode', 'net', 'genesis', 'camera']) if (typeof r[k] !== 'string') return `"${k}" no es texto`;
+  for (const k of ['taken', 'who', 'mode', 'net', 'genesis']) if (typeof r[k] !== 'string') return `"${k}" no es texto`;
   if (typeof r.stamp !== 'boolean') return '"stamp" no es sí/no';
   const b = r.block as Record<string, unknown> | undefined;
   if (!b || !Number.isInteger(b.n) || typeof b.hash !== 'string' || !HEX32.test(b.hash)) return 'bloque inválido';

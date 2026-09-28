@@ -147,7 +147,7 @@ test('recibo: bytes estables, firma sr25519 válida y cualquier cambio la rompe'
   const pair = sr25519PairFromSeed(new Uint8Array(32).fill(3));
   const r: Receipt = {
     v: 1, app: 'proofofcam', id: newId(), sha256: '0x' + 'ab'.repeat(32), dhash: '0f0e0d0c0b0a0908',
-    w: 1920, h: 1440, type: 'image/jpeg', size: 523211, stamp: true, camera: 'back', taken: '2026-09-28T19:20:11Z',
+    stamp: true, taken: '2026-09-28T19:20:11Z',
     block: { n: 13_806_571, hash: '0x' + 'cd'.repeat(32) }, loc: sealLocation(master, 'k3m9x2qp7t4v8w1a', 'dhwtq2vx', 4),
     who: 'ana.01', mode: 'identity', net: 'products-devnet', genesis: '0x' + 'ee'.repeat(32),
   };
@@ -157,6 +157,7 @@ test('recibo: bytes estables, firma sr25519 válida y cualquier cambio la rompe'
   const parsed = parseReceipt(bytes);
   assert.equal(typeof parsed, 'object');
   assert.deepEqual(parsed, JSON.parse(new TextDecoder().decode(bytes)));
+  for (const k of ['w', 'h', 'size', 'type', 'camera', 'model', 'ua', 'tz']) assert.ok(!(k in (parsed as object)), `el recibo no lleva "${k}"`);
 
   const sig = u8aToHex(sr25519Sign(bytes, pair));
   const pub = u8aToHex(pair.publicKey);
