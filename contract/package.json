@@ -1,0 +1,25 @@
+{
+  "name": "testigo-contract",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "PhotoRegistry: actas de nacimiento de fotos de Testigo en Asset Hub (PolkaVM).",
+  "scripts": {
+    "build": "resolc --bin -O3 --output-dir out --overwrite contracts/PhotoRegistry.sol && npm run build:evm",
+    "build:evm": "solc --abi --bin --optimize -o out-evm --overwrite contracts/PhotoRegistry.sol",
+    "test": "node test/registry.test.mjs",
+    "simulate": "node scripts/deploy.mjs --simulate",
+    "deploy": "node scripts/deploy.mjs"
+  },
+  "dependencies": {
+    "@polkadot-labs/hdkd": "^0.0.29",
+    "@polkadot-labs/hdkd-helpers": "^0.0.31",
+    "polkadot-api": "~2.2.1",
+    "viem": "^2.56.8"
+  },
+  "devDependencies": {
+    "@ethereumjs/evm": "^10.1.3",
+    "@ethereumjs/util": "^10.1.3",
+    "@ethereumjs/vm": "^10.1.3"
+  }
+}

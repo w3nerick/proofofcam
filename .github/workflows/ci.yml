@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  app:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+      - run: npm ci
+      - name: Pruebas (ids, geohash, huellas, ubicación, recibo)
+        run: npm test
+      - run: npm run build
+
+  contract:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: contract
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: contract/package-lock.json
+      - name: solc 0.8.36
+        run: |
+          sudo curl -sSfL -o /usr/local/bin/solc https://github.com/ethereum/solidity/releases/download/v0.8.36/solc-static-linux
+          sudo chmod +x /usr/local/bin/solc
+          solc --version
+      - run: npm ci
+      - run: npm run build:evm
+      - name: Pruebas de PhotoRegistry en EVM local
+        run: npm test
+      - name: El ABI de la app es el del contrato
+        run: diff <(jq -S . out-evm/PhotoRegistry.abi) <(jq -S . ../app/src/lib/PhotoRegistry.abi.json)

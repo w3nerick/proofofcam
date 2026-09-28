@@ -1,0 +1,6 @@
+node_modules
+dist
+*.car
+out
+out-evm
+.DS_Store

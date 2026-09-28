@@ -1,0 +1,37 @@
+{
+  "name": "testigo",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "test": "node --test \"test/*.test.ts\"",
+    "deploy": "npm run build && PAD_ENV=devnet pad dist testigocam26.dot",
+    "check-deploy": "node scripts/check-deploy.ts",
+    "icon": "node scripts/icon.ts"
+  },
+  "dependencies": {
+    "@fontsource-variable/dm-sans": "^5.3.0",
+    "@fontsource/dm-serif-display": "^5.3.0",
+    "@fontsource/space-mono": "^5.3.0",
+    "@noble/ciphers": "^1.3.0",
+    "@noble/hashes": "^1.8.0",
+    "@parity/product-sdk-host": "0.19.1",
+    "@parity/product-sdk-signer": "0.14.4",
+    "@phosphor-icons/core": "^2.1.1",
+    "@polkadot/util": "^13.5.4",
+    "@polkadot/util-crypto": "^13.5.4",
+    "polkadot-api": "~2.2.1",
+    "qrcode": "^1.5.4",
+    "viem": "^2.56.8"
+  },
+  "devDependencies": {
+    "@resvg/resvg-js": "^2.6.2",
+    "@types/qrcode": "^1.5.5",
+    "multiformats": "^13.4.2",
+    "typescript": "~5.9.3",
+    "vite": "^7.1.0"
+  }
+}
